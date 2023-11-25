@@ -1,0 +1,22 @@
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.4s ease;
+}
+
+.customAnimation-enter-active,
+.customAnimation-leave-active {
+  transition: 0.3s ease;
+  // transform: scale(100%);
+}
+
+.customAnimation-enter-from,
+.customAnimation-leave-to {
+  opacity: 0;
+  // transform: scale(92.5%);
+}
