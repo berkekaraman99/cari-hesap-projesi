@@ -24,6 +24,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+            <li class="nav-item me-2"><i class="fa-solid fa-city"></i></li>
             <li class="nav-item">{{ user.userName }}</li>
           </ul>
         </div>

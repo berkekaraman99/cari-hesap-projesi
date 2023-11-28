@@ -19,34 +19,38 @@
       </div>
     </div>
     <div class="offcanvas-body">
-      <p class="d-inline-flex gap-1">
-        <button
-          class="btn btn-primary"
+      <RouterLink :to="{ name: 'home' }">
+        <p class="sidebar-item" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasSidebar">Ana Sayfa</p>
+      </RouterLink>
+      <RouterLink :to="{ name: 'create-customer' }">
+        <p class="sidebar-item" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasSidebar">Müşteri Hesabı Oluştur</p>
+      </RouterLink>
+      <p class="gap-1">
+        <div
+          class="sidebar-item"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target="#collapseExample"
+          data-bs-target="#collapseReceipts"
           aria-expanded="false"
-          aria-controls="collapseExample"
+          aria-controls="collapseReceipts"
         >
-          Button with data-bs-target
-        </button>
+          Dekontlar
+      </div>
       </p>
-      <div class="collapse" id="collapseExample">
-        <div class="card card-body">
-          Some placeholder content for the collapse component. This panel is hidden by default but
-          revealed when the user activates the relevant trigger.
+      <div class="collapse" id="collapseReceipts">
+        <div class="card p-2">
+          <RouterLink :to="{ name: 'receivable-receipt' }">
+          <p class="sidebar-item" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasSidebar">Alacak Dekontu Oluştur</p>
+        </RouterLink>
+        <RouterLink :to="{ name: 'debt-receipt' }">
+          <p class="sidebar-item" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasSidebar">Borç Dekontu Oluştur</p>
+        </RouterLink>
         </div>
       </div>
-      <RouterLink :to="{ name: 'home' }">
-        <p class="sidebar-item">Ana Sayfa</p>
-      </RouterLink>
-      <RouterLink :to="{ name: 'receivable-receipt' }">
-        <p class="sidebar-item">Alacak Dekontu Oluştur</p>
-      </RouterLink>
-
-      <RouterLink :to="{ name: 'debt-receipt' }">
-        <p class="sidebar-item">Borç Dekontu Oluştur</p>
-      </RouterLink>
     </div>
   </div>
 </template>

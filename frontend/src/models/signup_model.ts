@@ -1,7 +1,8 @@
 export interface SignUpModel {
   companyName: string
   userName: string
-  database: string
   password: string
-  date: string
+  taxNumber: string
+  taxAdministration: string
+  createdAt: string
 }

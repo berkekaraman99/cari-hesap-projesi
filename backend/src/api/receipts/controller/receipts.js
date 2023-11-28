@@ -16,4 +16,4 @@ exports.createReceivableReceipt = (req, res, next) => {
   });
 };
 
-module.exports = { createDebtReceipt, createReceivableReceipt };
+// module.exports = { createDebtReceipt, createReceivableReceipt };

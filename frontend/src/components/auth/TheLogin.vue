@@ -34,21 +34,6 @@
           v-model="password"
         />
         <FormKit
-          type="date"
-          label="Tarih"
-          :validation="`required|date_before:${latestDate}`"
-          v-model="date"
-        />
-        <FormKit
-          type="text"
-          name="dbname"
-          label="Veri Tabanı"
-          placeholder="Veri Tabanı"
-          validation="required"
-          v-model="database"
-        />
-
-        <FormKit
           type="submit"
           label="Giriş Yap"
           :classes="{
@@ -57,7 +42,6 @@
           }"
         />
       </FormKit>
-      <button class="btn btn-primary" @click="toggle">Toggle Toast</button>
     </div>
   </div>
 </template>
@@ -67,14 +51,11 @@ import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-const latestDate = new Date().toISOString().slice(0, 10)
 
 const router = useRouter()
 const authStore = useAuthStore()
 const userName = ref<string>('')
 const password = ref<string>('')
-const date = ref(latestDate)
-const database = ref<string>('')
 
 const toastStore = useToastStore()
 const toggle = () => toastStore.toggleToast()
@@ -84,9 +65,7 @@ const login = async () => {
     await authStore
       .login({
         userName: userName.value,
-        password: password.value,
-        date: date.value,
-        database: database.value
+        password: password.value
       })
       .then(() => {
         toggle()
