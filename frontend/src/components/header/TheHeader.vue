@@ -1,6 +1,6 @@
 <template>
   <header class="cs-nav">
-    <nav class="navbar navbar-expand-sm bg-body-tertiary">
+    <nav class="navbar navbar-expand-sm bg-body-tertiary border border-1 shadow-sm">
       <div class="container-fluid">
         <button
           class="btn me-1"
@@ -11,6 +11,7 @@
           <i class="fa-solid fa-bars fa-lg"></i>
         </button>
         <span class="navbar-brand fw-bold">Cari Takip</span>
+
         <button
           class="navbar-toggler"
           type="button"
@@ -22,12 +23,13 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent" v-if="user != null">
           <ul class="navbar-nav me-auto mb-2 mb-sm-0">
             <li class="nav-item me-2"><i class="fa-solid fa-city"></i></li>
-            <li class="nav-item">{{ user.userName }}</li>
+            <li class="nav-item">{{ user.company_name }}</li>
           </ul>
         </div>
+        <button class="btn btn-danger" @click="logout()">Çıkış Yap</button>
       </div>
     </nav>
   </header>
@@ -36,10 +38,15 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const authStore = useAuthStore()
 
 const { _user: user } = storeToRefs(authStore)
+const logout = () => {
+  authStore.logout()
+}
 </script>
 
 <style scoped lang="scss">

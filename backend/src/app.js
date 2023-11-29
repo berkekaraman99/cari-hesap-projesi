@@ -1,14 +1,10 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
+require("dotenv").config();
 const bodyParser = require("body-parser");
-const db = require("./core/connection/mysql");
 const Routes = require("./api/_routes/index");
 
-dotenv.config();
 const app = express();
-
-// db.execute("");
 
 app.use(cors());
 app.use(express.json());
@@ -18,7 +14,7 @@ app.use(bodyParser.json());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  // res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
 

@@ -4,14 +4,17 @@
       <div class="card overflow-hidden">
         <div
           class="text-white py-2 px-3"
-          :class="{ 'bg-success': statusCode === 200, 'bg-danger': statusCode !== 200 }"
+          :class="{
+            'bg-success': statusCode === 200 || statusCode === 201,
+            'bg-danger': statusCode !== 200 && statusCode !== 201
+          }"
         >
           <div class="d-flex align-items-center justify-content-between">
             <strong>{{ header }}</strong>
           </div>
         </div>
-        <div class="toast-content p-2">
-          <div class="fw-medium">{{ content }}</div>
+        <div class="toast-content py-2 px-3">
+          <div class="fw-medium text-center">{{ content }}</div>
         </div>
       </div>
     </div>
@@ -33,7 +36,7 @@ const {
 
 <style scoped>
 .custom-toast {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   right: 0;
   min-height: 100px;

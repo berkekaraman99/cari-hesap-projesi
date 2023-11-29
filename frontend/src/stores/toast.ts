@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useToastStore = defineStore('toastStore', {
   state: () => ({
     showToast: false,
-    statusCode: 200 as null | number,
+    statusCode: null as null | number,
     toastHeader: '' as string,
     toastContent: '' as string
   }),
@@ -20,11 +20,11 @@ export const useToastStore = defineStore('toastStore', {
     setStatusCode(code: number) {
       this.statusCode = code
     },
-    setToastHeader(text: string) {
-      this.toastHeader = text
+    setToastHeader(headerText: string) {
+      this.toastHeader = headerText
     },
-    setToastContent(text: string) {
-      this.toastContent = text
+    setToastContent(contentText: string) {
+      this.toastContent = contentText
     }
   }
 })

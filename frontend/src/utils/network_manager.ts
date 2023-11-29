@@ -1,6 +1,7 @@
 import axios from 'axios'
+import { useAuthStore } from '@/stores/auth'
 
-const baseURL: string = 'https://localhost:3000/api'
+const baseURL: string = 'http://localhost:3000/api'
 const timeOut: number = 60000
 
 export const instance = axios.create({
@@ -13,3 +14,9 @@ export const instance = axios.create({
 //     config.headers.Authorization = `Bearer ${authStore.$state.accessToken}`
 //     return config
 //})
+
+instance.interceptors.request.use(function (config) {
+  const authStore = useAuthStore()
+  config.headers.Authorization = `Bearer ${authStore.$state.accessToken}`
+  return config
+})

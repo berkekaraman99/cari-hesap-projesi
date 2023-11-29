@@ -12,9 +12,7 @@ import TheSidebar from '@/components/sidebar/TheSidebar.vue'
       <div>
         <RouterView v-slot="{ Component }">
           <Transition name="customAnimation" mode="out-in">
-            <KeepAlive>
-              <component :is="Component" />
-            </KeepAlive>
+            <component :is="Component" />
           </Transition>
         </RouterView>
       </div>

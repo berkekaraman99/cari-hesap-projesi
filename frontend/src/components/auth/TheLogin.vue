@@ -49,30 +49,42 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
+import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { _statusCode: statusCode } = storeToRefs(authStore)
 const userName = ref<string>('')
 const password = ref<string>('')
 
 const toastStore = useToastStore()
-const toggle = () => toastStore.toggleToast()
+const toggleToast = () => toastStore.toggleToast()
 
 const login = async () => {
   if (userName.value !== '' || password.value !== '') {
+    toastStore.setToastHeader('Giriş Bilgisi')
     await authStore
       .login({
         userName: userName.value,
         password: password.value
       })
       .then(() => {
-        toggle()
-        setTimeout(() => {
-          toggle()
-          router.push({ name: 'home' })
-        }, 3000)
+        toastStore.setStatusCode(statusCode.value)
+        toggleToast()
+        if (statusCode.value === 200) {
+          toastStore.setToastContent('Giriş Başarılı, ana sayfaya yönlendiriliyorsunuz.')
+          setTimeout(() => {
+            toggleToast()
+            router.push({ name: 'home' })
+          }, 3000)
+        } else {
+          toastStore.setToastContent('Kullanıcı adı veya şifre hatalı!')
+          setTimeout(() => {
+            toggleToast()
+          }, 3000)
+        }
       })
   }
 }

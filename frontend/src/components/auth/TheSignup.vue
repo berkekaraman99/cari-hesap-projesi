@@ -74,6 +74,7 @@
             outer: 'mx-auto',
             wrapper: 'mx-auto text-center'
           }"
+          :disabled="statusCode === 201"
         />
       </FormKit>
     </div>
@@ -88,13 +89,15 @@ import { useRouter } from 'vue-router'
 
 import vData from '@/data/vergi_daireleri.json'
 import ilData from '@/data/iller.json'
+import { storeToRefs } from 'pinia'
+import { useToastStore } from '@/stores/toast'
 
 const signupModel: SignUpModel = reactive({
   userName: '',
   password: '',
   companyName: '',
   taxNumber: '',
-  tadAdministration: '',
+  taxAdministration: '',
   createdAt: new Date().toISOString()
 })
 const cityNo = ref<null | number>(null)
@@ -106,15 +109,43 @@ const vDaireleri = computed(() => {
 
 const iller: Array<any> = ilData.data
 
-// const latestDate = new Date().toISOString().slice(0, 10)
-
 const router = useRouter()
 const authStore = useAuthStore()
+const { _statusCode: statusCode } = storeToRefs(authStore)
+const toastStore = useToastStore()
+toastStore.setToastHeader('Kayıt Bilgisi')
+const toggleToast = () => toastStore.toggleToast()
 
 const signup = async () => {
-  signupModel.taxAdministration = iller.find((il) => il === cityNo.value)
+  const il = iller.find((il) => il.plaka == cityNo.value)
+  signupModel.taxAdministration = il.il_adi + ' - ' + vergi_dairesi.value
   if (signupModel.userName !== '' || signupModel.password !== '') {
-    await authStore.signup(signupModel).then(() => router.push({ name: 'home' }))
+    await authStore.signup(signupModel).then(() => {
+      toastStore.setStatusCode(statusCode.value)
+      toggleToast()
+      if (statusCode.value === 201) {
+        toastStore.setToastContent('Kayıt Başarılı!')
+        setTimeout(() => {
+          toggleToast()
+          router.push({ name: 'home' })
+        }, 3000)
+      } else if (statusCode.value === 1003) {
+        toastStore.setToastContent('Kullanıcı adı kullanımakta!')
+        setTimeout(() => {
+          toggleToast()
+        }, 3000)
+      } else if (statusCode.value === 1004) {
+        toastStore.setToastContent('Vergi numarası kullanılmakta!')
+        setTimeout(() => {
+          toggleToast()
+        }, 3000)
+      } else {
+        toastStore.setToastContent('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz')
+        setTimeout(() => {
+          toggleToast()
+        }, 3000)
+      }
+    })
   }
 }
 </script>

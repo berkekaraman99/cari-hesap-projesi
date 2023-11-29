@@ -9,6 +9,6 @@ const { _user: user } = storeToRefs(authStore)
 <template>
   <main>
     <h1>Ana Sayfa</h1>
-    <h3>Merhaba, hoşgeldin {{ user.userName }}</h3>
+    <h3>Merhaba, hoşgeldin {{ user.user_name }}</h3>
   </main>
 </template>
