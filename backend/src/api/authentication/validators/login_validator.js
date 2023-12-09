@@ -1,8 +1,6 @@
-const yup = require("yup");
+import yup from "yup";
 
-const loginValidator = yup.object().shape({
+export const loginValidator = yup.object().shape({
   userName: yup.string().required().min(6).max(20),
   password: yup.string().required().min(6).max(32),
 });
-
-module.exports = loginValidator;

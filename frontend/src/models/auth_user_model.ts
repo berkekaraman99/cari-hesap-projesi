@@ -1,6 +1,8 @@
 export interface AuthUser {
-  companyName: string
-  userName: string
-  date: string
-  database: string
+  id: number
+  company_name: string
+  user_name: string
+  tax_number: string
+  tax_administration: string
+  tax_administration_city: string
 }

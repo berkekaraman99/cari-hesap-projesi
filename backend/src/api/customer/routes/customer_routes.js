@@ -1,13 +1,12 @@
-const express = require("express");
+import express from "express";
+import { createCustomer, getCustomers, searchCustomers, getCustomerById, updateCustomer } from "../controller/customer_controller.js";
 
-const customerController = require("../controller/customer_controller");
+const CustomerRoutes = express.Router();
 
-const router = express.Router();
+CustomerRoutes.post("/create-customer", createCustomer);
+CustomerRoutes.post("/update-customer", updateCustomer);
+CustomerRoutes.get("/fetch-customers", getCustomers);
+CustomerRoutes.get("/search", searchCustomers);
+CustomerRoutes.get("/get-customer", getCustomerById);
 
-router.post("/create-customer", customerController.createCustomer);
-
-router.get("/fetch-customers", customerController.getCustomers);
-
-router.get("/search", customerController.searchCustomers);
-
-module.exports = router;
+export default CustomerRoutes;

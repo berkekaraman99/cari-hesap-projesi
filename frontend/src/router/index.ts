@@ -18,6 +18,11 @@ const routes = [
     component: () => import('@/views/HomeView/HomeView.vue')
   },
   {
+    path: '/profile',
+    name: 'user-profile',
+    component: () => import('@/views/UserProfileView/UserProfile.vue')
+  },
+  {
     path: '/create-customer',
     name: 'create-customer',
     component: () => import('@/views/CreateCustomerView/CreateCustomer.vue')
@@ -26,6 +31,23 @@ const routes = [
     path: '/customers',
     name: 'customers',
     component: () => import('@/views/CustomersView/CustomersView.vue')
+  },
+  {
+    path: '/customer/:id',
+    name: 'customer-details',
+    component: () => import('@/views/CustomerDetailsView/CustomerDetails.vue'),
+    props: true
+  },
+  {
+    path: '/customer/edit/:id',
+    name: 'customer-edit',
+    component: () => import('@/views/CustomerEditView/CustomerEdit.vue'),
+    props: true
+  },
+  {
+    path: '/receipts',
+    name: 'receipts',
+    component: () => import('@/views/ReceiptsView/ReceiptsAll.vue')
   },
   {
     path: '/debt-receipt',

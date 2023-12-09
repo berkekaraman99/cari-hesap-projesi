@@ -6,6 +6,7 @@ import { plugin as formKitPlugin } from '@formkit/vue'
 import App from './App.vue'
 import router from './router'
 import TheToast from '@/components/shared/TheToast.vue'
+import TheLoadingVue from './components/shared/TheLoading.vue'
 
 import './style.scss'
 
@@ -18,5 +19,6 @@ app.use(router)
 app.use(formKitPlugin, formkitConfig)
 
 app.component('the-toast', TheToast)
+app.component('the-loading', TheLoadingVue)
 
 app.mount('#app')

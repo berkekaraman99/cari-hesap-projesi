@@ -1,13 +1,12 @@
-const express = require("express");
+import express from "express";
+import AuthRoutes from "../authentication/routes/auth_routes.js";
+import ReceiptRoutes from "../receipts/routes/receipt_routes.js";
+import CustomerRoutes from "../customer/routes/customer_routes.js";
 
-const router = express.Router();
+const RootRoutes = express.Router();
 
-const AuthRoutes = require("../authentication/routes/auth_routes");
-const ReceiptRoutes = require("../receipts/routes/receipt_routes");
-const CustomerRoutes = require("../customer/routes/customer_routes");
+RootRoutes.use("/auth", AuthRoutes);
+RootRoutes.use("/receipts", ReceiptRoutes);
+RootRoutes.use("/customer", CustomerRoutes);
 
-router.use("/auth", AuthRoutes);
-router.use("/receipts", ReceiptRoutes);
-router.use("/customer", CustomerRoutes);
-
-module.exports = router;
+export default RootRoutes;

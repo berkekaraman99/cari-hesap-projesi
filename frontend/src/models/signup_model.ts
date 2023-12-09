@@ -4,5 +4,6 @@ export interface SignUpModel {
   password: string
   taxNumber: string
   taxAdministration: string
+  taxAdministrationCity: string
   createdAt: string
 }

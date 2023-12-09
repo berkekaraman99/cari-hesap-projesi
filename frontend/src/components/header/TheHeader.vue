@@ -10,7 +10,7 @@
         >
           <i class="fa-solid fa-bars fa-lg"></i>
         </button>
-        <span class="navbar-brand fw-bold">Cari Takip</span>
+        <span class="navbar-brand fw-bold brand">CARİ TAKİP</span>
 
         <button
           class="navbar-toggler"
@@ -29,7 +29,7 @@
             <li class="nav-item">{{ user.company_name }}</li>
           </ul>
         </div>
-        <button class="btn btn-danger" @click="logout()">Çıkış Yap</button>
+        <button class="btn btn-danger fw-bold" @click="logout()">Çıkış Yap</button>
       </div>
     </nav>
   </header>
@@ -50,6 +50,12 @@ const logout = () => {
 </script>
 
 <style scoped lang="scss">
+.brand {
+  cursor: pointer;
+  background: linear-gradient(to right, #30cfd0 0%, #330867 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 .cs-nav {
   padding: 0.75rem 0.75rem;
 

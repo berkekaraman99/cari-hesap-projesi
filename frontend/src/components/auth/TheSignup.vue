@@ -26,16 +26,18 @@
           name="city"
           label="Vergi Dairesi Şehir"
           placeholder="Vergi Dairesi Şehir"
-          v-model="cityNo"
+          v-model="signupModel.taxAdministrationCity"
         >
-          <option v-for="il in iller" :value="il.plaka">{{ il.il_adi }}</option>
+          <option v-for="il in iller" :value="il.il_adi" v-bind:key="il.plaka">
+            {{ il.il_adi }}
+          </option>
         </FormKit>
         <FormKit
           type="select"
           name="tax-administration"
           label="Vergi Dairesi"
           placeholder="Vergi Dairesi"
-          v-model="vergi_dairesi"
+          v-model="signupModel.taxAdministration"
         >
           <template v-for="vDaire in vDaireleri" :key="vDaire.id">
             <option>
@@ -54,7 +56,8 @@
           type="text"
           name="username"
           label="Kullanıcı Adı"
-          validation="required"
+          validation="required|length:6"
+          validation-visibility="live"
           v-model="signupModel.userName"
         />
         <FormKit
@@ -65,6 +68,7 @@
           :validation-messages="{
             matches: 'Please include at least one symbol'
           }"
+          validation-visibility="live"
           v-model="signupModel.password"
         />
         <FormKit
@@ -74,7 +78,7 @@
             outer: 'mx-auto',
             wrapper: 'mx-auto text-center'
           }"
-          :disabled="statusCode === 201"
+          :disabled="statusCode === 201 || statusCode === 200"
         />
       </FormKit>
     </div>
@@ -82,9 +86,8 @@
 </template>
 
 <script setup lang="ts">
-import type { SignUpModel } from '@/models/signup_model'
 import { useAuthStore } from '@/stores/auth'
-import { reactive, ref, watch, computed } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import vData from '@/data/vergi_daireleri.json'
@@ -92,19 +95,17 @@ import ilData from '@/data/iller.json'
 import { storeToRefs } from 'pinia'
 import { useToastStore } from '@/stores/toast'
 
-const signupModel: SignUpModel = reactive({
+const signupModel = reactive({
   userName: '',
   password: '',
   companyName: '',
   taxNumber: '',
   taxAdministration: '',
-  createdAt: new Date().toISOString()
+  taxAdministrationCity: ''
 })
-const cityNo = ref<null | number>(null)
-const vergi_dairesi = ref(null)
 
 const vDaireleri = computed(() => {
-  return vData.data.filter((il) => il.il_id == cityNo.value)
+  return vData.data.filter((il) => il.il_adi === signupModel.taxAdministrationCity)
 })
 
 const iller: Array<any> = ilData.data
@@ -117,10 +118,8 @@ toastStore.setToastHeader('Kayıt Bilgisi')
 const toggleToast = () => toastStore.toggleToast()
 
 const signup = async () => {
-  const il = iller.find((il) => il.plaka == cityNo.value)
-  signupModel.taxAdministration = il.il_adi + ' - ' + vergi_dairesi.value
   if (signupModel.userName !== '' || signupModel.password !== '') {
-    await authStore.signup(signupModel).then(() => {
+    await authStore.signup({ ...signupModel, createdAt: new Date().toISOString() }).then(() => {
       toastStore.setStatusCode(statusCode.value)
       toggleToast()
       if (statusCode.value === 201) {

@@ -3,19 +3,20 @@ import type { SignUpModel } from '@/models/signup_model'
 import { defineStore } from 'pinia'
 import { instance } from '@/utils/network_manager'
 import SecureLS from 'secure-ls'
+import type { AuthUser } from '@/models/auth_user_model'
 
 const ls = new SecureLS({ isCompression: false })
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
-    user: null as any | null,
+    user: null as null | AuthUser,
     statusCode: 0 as number,
-    accessToken: null as null | string
+    accessToken: '' as string
   }),
   getters: {
-    _user: (state: any) => state.user as any | null,
-    _statusCode: (state: any) => state.statusCode as any | null,
-    _accessToken: (state: any) => state.accessToken as any | null
+    _user: (state: any) => state.user as AuthUser,
+    _statusCode: (state: any) => state.statusCode as number,
+    _accessToken: (state: any) => state.accessToken as string
   },
   actions: {
     async login(user: LoginModel) {

@@ -40,6 +40,7 @@
             outer: 'mx-auto',
             wrapper: 'mx-auto text-center'
           }"
+          :disabled="statusCode === 200"
         />
       </FormKit>
     </div>
@@ -90,4 +91,4 @@ const login = async () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

@@ -1,10 +1,10 @@
-const express = require("express");
+import express from "express";
+import { createReceipt, fetchReceipts } from "../controller/receipt_controller.js";
 
-const receiptController = require("../controller/receipts");
-
-const router = express.Router();
+const ReceiptRoutes = express.Router();
 
 //POST CREATE-RECEIPT
-router.post("/create-receipt", receiptController.createReceipt);
+ReceiptRoutes.post("/create-receipt", createReceipt);
+ReceiptRoutes.get("/get-receipts", fetchReceipts);
 
-module.exports = router;
+export default ReceiptRoutes;

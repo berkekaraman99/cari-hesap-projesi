@@ -9,13 +9,11 @@ import TheSidebar from '@/components/sidebar/TheSidebar.vue'
     <TheHeader v-if="$route.name !== 'auth'" />
     <TheSidebar />
     <div class="container-md">
-      <div>
-        <RouterView v-slot="{ Component }">
-          <Transition name="customAnimation" mode="out-in">
-            <component :is="Component" />
-          </Transition>
-        </RouterView>
-      </div>
+      <RouterView v-slot="{ Component }">
+        <Transition name="customAnimation" mode="out-in">
+          <component :is="Component" />
+        </Transition>
+      </RouterView>
     </div>
   </div>
   <the-toast></the-toast>

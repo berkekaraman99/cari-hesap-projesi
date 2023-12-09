@@ -1,12 +1,12 @@
-const loginValidator = require("../validators/login_validator");
-const db = require("../../../core/connection/mysql");
-const signUpValidator = require("../validators/signup_validator");
-const { generateToken, decodeToken } = require("../../../features/utils/token_helper");
-const BaseResponse = require("../../../core/response/base_response");
-const { hashPassword, comparePassword } = require("../../../features/utils/hash_password");
-const UnauthorizedException = require("../../../core/exceptions/unauthorized_exception");
+import { loginValidator } from "../validators/login_validator.js";
+import { db } from "../../../core/connection/mysql.js";
+import { signUpValidator } from "../validators/signup_validator.js";
+import { generateToken, decodeToken } from "../../../features/utils/token_helper.js";
+import BaseResponse from "../../../core/response/base_response.js";
+import { hashPassword, comparePassword } from "../../../features/utils/hash_password.js";
+import UnauthorizedException from "../../../core/exceptions/unauthorized_exception.js";
 
-const login = async (req, res, next) => {
+export const login = async (req, res, next) => {
   try {
     const { userName, password } = req.body;
     await loginValidator
@@ -37,9 +37,9 @@ const login = async (req, res, next) => {
   }
 };
 
-const signup = async (req, res, next) => {
+export const signup = async (req, res, next) => {
   try {
-    const { companyName, userName, password, taxNumber, taxAdministration, createdAt } = req.body;
+    const { companyName, userName, password, taxNumber, taxAdministration, taxAdministrationCity, createdAt } = req.body;
     await signUpValidator
       .validate({
         companyName,
@@ -47,6 +47,7 @@ const signup = async (req, res, next) => {
         password,
         taxNumber,
         taxAdministration,
+        taxAdministrationCity,
       })
       .catch((_) => {
         throw new Error("Validation Error");
@@ -73,8 +74,8 @@ const signup = async (req, res, next) => {
     }
 
     await db.query({
-      sql: "INSERT INTO users (company_name, user_name, tax_number, tax_administration, password, createdAt) VALUES (?, ?, ?, ?, ?, ?)",
-      values: [companyName, userName, taxNumber, taxAdministration, hashedPassword, createdAt],
+      sql: "INSERT INTO users (company_name, user_name, tax_number, tax_administration, tax_administration_city, password, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      values: [companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, hashedPassword, createdAt],
     });
 
     const [getId] = await db.query({
@@ -92,11 +93,14 @@ const signup = async (req, res, next) => {
   }
 };
 
-const getUserAfterLogin = async (req, res, next) => {
+export const getUserAfterLogin = async (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   try {
     const decodedToken = decodeToken(token);
-    const [row] = await db.query({ sql: "SELECT * FROM users WHERE id = ?", values: [decodedToken.id] });
+    const [row] = await db.query({
+      sql: "SELECT id, company_name, user_name, tax_number, tax_administration, tax_administration_city FROM users WHERE id = ?",
+      values: [decodedToken.id],
+    });
 
     console.log(row[0]);
     return res.status(200).json(BaseResponse.success(row[0], 200));
@@ -104,5 +108,3 @@ const getUserAfterLogin = async (req, res, next) => {
     return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
   }
 };
-
-module.exports = { login, signup, getUserAfterLogin };

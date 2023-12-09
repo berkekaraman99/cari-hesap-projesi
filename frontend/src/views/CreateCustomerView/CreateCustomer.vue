@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="col-12 col-sm-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
     <h1>Müşteri Bilgileri</h1>
     <form @submit.prevent="createCustomer">
       <div class="card card-body table-responsive">
@@ -22,7 +22,9 @@
             <td>
               <div>
                 <FormKit type="select" name="city" v-model="cityNo">
-                  <option v-for="il in iller" :value="il.plaka">{{ il.il_adi }}</option>
+                  <option v-for="il in iller" :value="il.plaka" v-bind:key="il.plaka">
+                    {{ il.il_adi }}
+                  </option>
                 </FormKit>
               </div>
             </td>
@@ -93,12 +95,16 @@ const vDaireleri = computed(() => {
 const iller: Array<any> = ilData.data
 
 const customerForm = reactive({
-  customerId: new Date().getTime(),
   customerName: '',
   taxAdministration: '',
-  taxNumber: '',
-  createdAt: new Date().toISOString()
+  taxNumber: ''
 })
+
+const resetForm = () => {
+  customerForm.customerName = ''
+  customerForm.taxAdministration = ''
+  customerForm.taxNumber = ''
+}
 
 const createCustomer = async () => {
   const il = iller.find((il) => il.plaka == cityNo.value)
@@ -107,11 +113,17 @@ const createCustomer = async () => {
 
   if (customerForm.customerName !== '' || customerForm.taxNumber !== '') {
     await customerStore
-      .createCustomer({ ...customerForm, connectedUserId: user.value.id })
+      .createCustomer({
+        ...customerForm,
+        connectedUserId: user.value.id,
+        customerId: new Date().getTime(),
+        createdAt: new Date().toISOString()
+      })
       .then(() => {
         toastStore.setStatusCode(statusCode.value)
         toggleToast()
         if (statusCode.value === 201) {
+          resetForm()
           toastStore.setToastContent('Müşteri oluşturuldu!')
           setTimeout(() => {
             toggleToast()

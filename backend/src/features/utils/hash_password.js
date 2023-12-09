@@ -1,6 +1,6 @@
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
-const hashPassword = async (password) => {
+export const hashPassword = async (password) => {
   const saltRounds = 10;
 
   try {
@@ -21,7 +21,7 @@ const hashPassword = async (password) => {
   }
 };
 
-const comparePassword = async (password, hashedPassword) => {
+export const comparePassword = async (password, hashedPassword) => {
   try {
     const match = await bcrypt.compare(password, hashedPassword);
     return match;
@@ -29,5 +29,3 @@ const comparePassword = async (password, hashedPassword) => {
     throw new Error("Şifre karşılaştırma hatası: " + error.message);
   }
 };
-
-module.exports = { hashPassword, comparePassword };

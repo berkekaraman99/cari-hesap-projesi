@@ -1,4 +1,4 @@
-class BaseResponse {
+export default class BaseResponse {
   constructor(data, isSuccess, statusCode, errors) {
     this.data = data;
     this.isSuccess = isSuccess;
@@ -14,5 +14,3 @@ class BaseResponse {
     return new BaseResponse(null, false, statusCode, errors);
   }
 }
-
-module.exports = BaseResponse;

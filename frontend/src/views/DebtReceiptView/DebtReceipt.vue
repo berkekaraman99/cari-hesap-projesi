@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="col-12 col-sm-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
     <h1>Borç Dekontu</h1>
     <form @submit.prevent="sendReceipt()">
       <div class="card card-body table-responsive">
@@ -33,7 +33,7 @@
                   type="date"
                   value="2011-01-01"
                   name="Tarih"
-                  :validation="'required|date_before:' + updatedDate"
+                  :validation="'required|date_before:' + maxDate"
                   v-model="receiptForm.createdDate"
                   validation-visibility="live"
                 />
@@ -117,7 +117,8 @@ const toggleToast = () => {
 const latestDate = new Date()
 latestDate.setDate(latestDate.getDate() + 1)
 
-const updatedDate = latestDate.toISOString().slice(0, 10)
+const maxDate = latestDate.toISOString().slice(0, 10)
+const currentDate = new Date().toISOString().slice(0, 10)
 
 const customerName = ref('')
 
@@ -135,7 +136,7 @@ const receiptForm = reactive({
   receiptId: new Date().getTime(),
   userId: user.value.id,
   customerId: '',
-  createdDate: updatedDate,
+  createdDate: currentDate,
   documentNo: '',
   price: '',
   description: '',
@@ -144,7 +145,7 @@ const receiptForm = reactive({
 
 const clearInputs = () => {
   receiptForm.customerId = ''
-  receiptForm.createdDate = updatedDate
+  receiptForm.createdDate = currentDate
   receiptForm.documentNo = ''
   receiptForm.price = ''
   receiptForm.description = ''
