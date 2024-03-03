@@ -1,5 +1,5 @@
 import express from "express";
-import { login, signup, getUserAfterLogin } from "../controller/auth_controller.js";
+import { login, signup, getUserAfterLogin, updateUserInfos } from "../controller/auth_controller.js";
 
 const AuthRoutes = express.Router();
 
@@ -8,6 +8,7 @@ AuthRoutes.post("/login", login);
 
 //POST SIGNUP
 AuthRoutes.post("/signup", signup);
+AuthRoutes.post("/update-user", updateUserInfos);
 
 AuthRoutes.get("/getUserAfterLogin", getUserAfterLogin);
 

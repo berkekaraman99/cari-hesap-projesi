@@ -1,9 +1,18 @@
 import BaseResponse from "../../../core/response/base_response.js";
 import { db } from "../../../core/connection/mysql.js";
+import { createCustomerValidator } from "../validators/create_customer_validator.js";
 
 export const createCustomer = async (req, res, next) => {
   try {
-    const { customerId, customerName, taxAdministration, taxAdministrationCity, taxNumber, createdAt, connectedUserId } = req.body;
+    const { customerId, customerName, taxAdministration, taxAdministrationCity, taxNumber, createdAt, connectedUserId, customerType } = req.body;
+    await createCustomerValidator
+      .validate({
+        customerName,
+        taxNumber,
+      })
+      .catch((_) => {
+        throw new Error("Validation Error");
+      });
 
     const checkIsCustomerUnique = await db.query({
       sql: "SELECT * FROM customers WHERE customer_id = ?",
@@ -24,8 +33,8 @@ export const createCustomer = async (req, res, next) => {
     }
 
     await db.query({
-      sql: "INSERT INTO customers (customer_id, customer_name, tax_number, tax_administration, tax_administration_city, createdAt, connected_user_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      values: [customerId, customerName, taxNumber, taxAdministration, taxAdministrationCity, createdAt, connectedUserId],
+      sql: "INSERT INTO customers (customer_id, customer_name, tax_number, tax_administration, tax_administration_city, created_at, connected_user_id, customer_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      values: [customerId, customerName, taxNumber, taxAdministration, taxAdministrationCity, createdAt, connectedUserId, customerType],
     });
 
     res.status(201).json(BaseResponse.success("Customer created successfully!", 201));
@@ -88,5 +97,32 @@ export const searchCustomers = async (req, res, next) => {
     res.status(200).json(BaseResponse.success(customers, 200));
   } catch (error) {
     res.status(500).json(BaseResponse.fail(error.message, error.statusCode));
+  }
+};
+
+export const getCustomerReceiptCount = async (req, res, next) => {
+  try {
+    const { customerId } = req.query;
+    const [receiptCount] = await db.query({
+      sql: "SELECT COUNT(*) AS receipt_count, SUM(CASE WHEN type = 1 then 1 else 0 end) as alacak_count, SUM(CASE WHEN type = 2 then 1 else 0 end) as borc_count FROM receipts WHERE customer_id = ?",
+      values: [customerId],
+    });
+
+    return res.status(200).json(BaseResponse.success(receiptCount, 200));
+  } catch (e) {
+    return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
+  }
+};
+
+export const fetchReceipts = async (req, res, next) => {
+  try {
+    const { customerId } = req.query;
+    const [receipts] = await db.query({
+      sql: "SELECT * FROM receipts WHERE customer_id = ? && receipts.is_deleted = ?",
+      values: [customerId, 0],
+    });
+    return res.status(200).json(BaseResponse.success(receipts, 200));
+  } catch (e) {
+    return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
   }
 };

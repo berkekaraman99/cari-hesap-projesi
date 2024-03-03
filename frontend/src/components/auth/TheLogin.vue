@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12 col-sm-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
+  <div>
     <div class="card card-body rounded-top-0 border-top-0 shadow py-5">
       <FormKit
         type="form"
@@ -49,10 +49,14 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
-import { useToastStore } from '@/stores/toast'
+// import { useToastStore } from '@/stores/toast'
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+// declare var bootstrap: any
+import { useToast } from 'vue-toastification'
+
+const toast = useToast()
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -60,32 +64,53 @@ const { _statusCode: statusCode } = storeToRefs(authStore)
 const userName = ref<string>('')
 const password = ref<string>('')
 
-const toastStore = useToastStore()
-const toggleToast = () => toastStore.toggleToast()
+// const toastStore = useToastStore()
+// toastStore.setToastHeader('Giriş Bilgisi')
+
+// let toastTrigger
+// let toastLiveExample
+
+// onMounted(() => {
+//   toastTrigger = document.getElementById('liveToastBtn') as HTMLElement
+//   toastLiveExample = document.getElementById('liveToast') as HTMLElement
+
+//   console.log(toastTrigger)
+//   console.log(toastLiveExample)
+// })
+
+// const handleToast = () => {
+//   const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample!)
+//   toastBootstrap.show()
+// }
 
 const login = async () => {
   if (userName.value !== '' || password.value !== '') {
-    toastStore.setToastHeader('Giriş Bilgisi')
     await authStore
       .login({
         userName: userName.value,
         password: password.value
       })
       .then(() => {
-        toastStore.setStatusCode(statusCode.value)
-        toggleToast()
-        if (statusCode.value === 200) {
-          toastStore.setToastContent('Giriş Başarılı, ana sayfaya yönlendiriliyorsunuz.')
-          setTimeout(() => {
-            toggleToast()
-            router.push({ name: 'home' })
-          }, 3000)
-        } else {
-          toastStore.setToastContent('Kullanıcı adı veya şifre hatalı!')
-          setTimeout(() => {
-            toggleToast()
-          }, 3000)
+        switch (statusCode.value) {
+          case 200:
+            toast.success('Giriş Başarılı, ana sayfaya yönlendiriliyorsunuz.', {
+              timeout: 2500
+            })
+            setTimeout(() => {
+              router.push({ name: 'home' })
+            }, 3000)
+            break
+          default:
+            toast.error('Kullanıcı adı veya şifre hatalı!', {
+              timeout: 2500
+            })
+            break
         }
+        setTimeout(() => {
+          authStore.$patch({
+            statusCode: 0
+          })
+        }, 3000)
       })
   }
 }

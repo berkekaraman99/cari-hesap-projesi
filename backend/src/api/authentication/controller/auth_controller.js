@@ -23,7 +23,7 @@ export const login = async (req, res, next) => {
     if (row.length === 0) {
       throw new UnauthorizedException("Invalid email or password");
     }
-    if (!(await comparePassword(password, row[0].password))) {
+    if (!(await comparePassword(password, row[0].hashed_password))) {
       throw new UnauthorizedException("Invalid email or password");
     }
 
@@ -39,9 +39,10 @@ export const login = async (req, res, next) => {
 
 export const signup = async (req, res, next) => {
   try {
-    const { companyName, userName, password, taxNumber, taxAdministration, taxAdministrationCity, createdAt } = req.body;
+    const { id, companyName, userName, password, taxNumber, taxAdministration, taxAdministrationCity, createdAt } = req.body;
     await signUpValidator
       .validate({
+        id,
         companyName,
         userName,
         password,
@@ -74,8 +75,8 @@ export const signup = async (req, res, next) => {
     }
 
     await db.query({
-      sql: "INSERT INTO users (company_name, user_name, tax_number, tax_administration, tax_administration_city, password, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      values: [companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, hashedPassword, createdAt],
+      sql: "INSERT INTO users (id, company_name, user_name, tax_number, tax_administration, tax_administration_city, hashed_password, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      values: [id, companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, hashedPassword, createdAt],
     });
 
     const [getId] = await db.query({
@@ -106,5 +107,20 @@ export const getUserAfterLogin = async (req, res, next) => {
     return res.status(200).json(BaseResponse.success(row[0], 200));
   } catch (e) {
     return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
+  }
+};
+
+export const updateUserInfos = async (req, res, next) => {
+  try {
+    const { id, companyName, userName, taxNumber, taxAdministration, taxAdministrationCity } = req.body;
+
+    await db.query({
+      sql: "UPDATE users SET company_name = ?, user_name = ?, tax_number = ?, tax_administration = ?, tax_administration_city = ? WHERE id = ?",
+      values: [companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, id],
+    });
+
+    return res.status(200).json(BaseResponse.success("Kullanıcı bilgileri başarıyla güncellendi", 200));
+  } catch (e) {
+    return res.status(200).json(BaseResponse.success(e.message, e.statusCode));
   }
 };

@@ -6,6 +6,32 @@
       <div class="card card-body table-responsive">
         <table class="table table-borderless">
           <tr>
+            <th>Müşteri Tipi</th>
+            <td>
+              <FormKit
+                v-model="customerForm.customerType"
+                type="radio"
+                :options="[
+                  { label: 'Şahsi', value: 'personal' },
+                  { label: 'Şirket', value: 'company' }
+                ]"
+              />
+            </td>
+          </tr>
+          <tr v-if="customerForm.customerType === 'personal'">
+            <th>Adı ve Soyadı</th>
+            <td>
+              <div>
+                <FormKit
+                  type="text"
+                  name="Firma Adı"
+                  validation="required"
+                  v-model="customerForm.customerName"
+                />
+              </div>
+            </td>
+          </tr>
+          <tr v-else-if="customerForm.customerType === 'company'">
             <th>Firma Adı</th>
             <td>
               <div>
@@ -18,7 +44,7 @@
               </div>
             </td>
           </tr>
-          <tr>
+          <tr v-if="customerForm.customerType === 'company'">
             <th>Vergi Dairesi Şehir</th>
             <td>
               <div>
@@ -30,7 +56,11 @@
               </div>
             </td>
           </tr>
-          <tr>
+          <tr
+            v-if="
+              customerForm.taxAdministrationCity != '' && customerForm.customerType === 'company'
+            "
+          >
             <th>Vergi Dairesi</th>
             <td>
               <div>
@@ -48,7 +78,7 @@
               </div>
             </td>
           </tr>
-          <tr>
+          <tr v-if="customerForm.customerType === 'company'">
             <th>Vergi No</th>
             <td>
               <div>
@@ -61,10 +91,29 @@
               </div>
             </td>
           </tr>
+          <tr v-else-if="customerForm.customerType === 'personal'">
+            <th>TC No</th>
+            <td>
+              <div>
+                <FormKit
+                  type="text"
+                  name="TC No"
+                  validation="number|required|length:10,11|matches:/[0-9]/"
+                  v-model="customerForm.taxNumber"
+                />
+              </div>
+            </td>
+          </tr>
         </table>
         <div class="d-flex align-items-center justify-content-end">
-          <button class="btn btn-primary mx-1" type="submit">Kaydet</button>
-          <button class="btn btn-secondary mx-1" type="button">Temizle</button>
+          <FormKit type="submit" label="Kaydet" :disabled="statusCode === 201" />
+          <FormKit
+            type="button"
+            label="Temizle"
+            :classes="{
+              input: 'bg-secondary'
+            }"
+          />
         </div>
       </div>
     </form>
@@ -80,8 +129,9 @@ import { computed } from 'vue'
 import { useCustomerStore } from '@/stores/customer'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
-import { useToastStore } from '@/stores/toast'
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const props = defineProps({
   id: {
@@ -90,10 +140,12 @@ const props = defineProps({
   }
 })
 
+const toast = useToast()
 const isLoading = ref(true)
 
 const authStore = useAuthStore()
-const { _user: user } = storeToRefs(authStore)
+// const { _user: user } = storeToRefs(authStore)
+const router = useRouter()
 
 const customerStore = useCustomerStore()
 const { _statusCode: statusCode, _customer: customer } = storeToRefs(customerStore)
@@ -104,14 +156,13 @@ const getCustomer = async () => {
     customerForm.taxNumber = customer.value.tax_number
     customerForm.taxAdministration = customer.value.tax_administration
     customerForm.taxAdministrationCity = customer.value.tax_administration_city
+    customerForm.customerType = customer.value.customer_type
   })
 }
 
-onMounted(() => getCustomer())
-
-const toastStore = useToastStore()
-toastStore.setToastHeader('Bilgi')
-const toggleToast = () => toastStore.toggleToast()
+onMounted(() => {
+  getCustomer()
+})
 
 const vDaireleri = computed(() => {
   return vData.data.filter((il) => il.il_adi === customerForm.taxAdministrationCity)
@@ -123,7 +174,8 @@ const customerForm = reactive({
   customerName: '',
   taxAdministration: '',
   taxAdministrationCity: '',
-  taxNumber: ''
+  taxNumber: '',
+  customerType: ''
 })
 
 const update = async () => {
@@ -133,18 +185,17 @@ const update = async () => {
     await customerStore
       .updateCustomer({ ...customerForm, customerId: customer.value.customer_id })
       .then(() => {
-        toastStore.setStatusCode(statusCode.value)
-        toggleToast()
         if (statusCode.value === 201) {
-          toastStore.setToastContent('Müşteri bilgileri güncellendi!')
+          toast.success('Müşteri bilgileri güncellendi!', {
+            timeout: 2500
+          })
           setTimeout(() => {
-            toggleToast()
+            router.push({ name: 'customers' })
           }, 3000)
         } else {
-          toastStore.setToastContent('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz')
-          setTimeout(() => {
-            toggleToast()
-          }, 3000)
+          toast.error('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz', {
+            timeout: 2500
+          })
         }
       })
   }

@@ -1,5 +1,5 @@
 export interface AuthUser {
-  id: number
+  id: string
   company_name: string
   user_name: string
   tax_number: string

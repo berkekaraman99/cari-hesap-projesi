@@ -1,10 +1,25 @@
-import express from "express";
-import { createReceipt, fetchReceipts } from "../controller/receipt_controller.js";
+import { Router } from "express";
+import {
+  createReceipt,
+  deleteReceipt,
+  fetchReceipts,
+  getDebtReceiptTotalPrice,
+  getReceiptById,
+  getReceiptCount,
+  getReceivableReceiptTotalPrice,
+} from "../controller/receipt_controller.js";
 
-const ReceiptRoutes = express.Router();
+import authorizationMiddleware from "../../../features/middlewares/authorization_middleware.js";
+
+const ReceiptRoutes = Router();
 
 //POST CREATE-RECEIPT
-ReceiptRoutes.post("/create-receipt", createReceipt);
-ReceiptRoutes.get("/get-receipts", fetchReceipts);
+ReceiptRoutes.post("/create-receipt", authorizationMiddleware, createReceipt);
+ReceiptRoutes.get("/get-receipts", authorizationMiddleware, fetchReceipts);
+ReceiptRoutes.get("/get-receipt-count", authorizationMiddleware, getReceiptCount);
+ReceiptRoutes.get("/get-debt-total-price", authorizationMiddleware, getDebtReceiptTotalPrice);
+ReceiptRoutes.get("/get-receivable-total-price", authorizationMiddleware, getReceivableReceiptTotalPrice);
+ReceiptRoutes.get("/get-receipt-by-id", authorizationMiddleware, getReceiptById);
+ReceiptRoutes.post("/delete-receipt", authorizationMiddleware, deleteReceipt);
 
 export default ReceiptRoutes;

@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/auth'
+import { checkTokenValidity } from '@/utils/token_helper'
 import { storeToRefs } from 'pinia'
 import {
   createRouter,
@@ -23,6 +24,11 @@ const routes = [
     component: () => import('@/views/UserProfileView/UserProfile.vue')
   },
   {
+    path: '/create-receipt',
+    name: 'create-receipt',
+    component: () => import('@/views/CreateReceiptView/CreateReceipt.vue')
+  },
+  {
     path: '/create-customer',
     name: 'create-customer',
     component: () => import('@/views/CreateCustomerView/CreateCustomer.vue')
@@ -39,6 +45,12 @@ const routes = [
     props: true
   },
   {
+    path: '/customer/:id/receipts',
+    name: 'customer-receipts',
+    component: () => import('@/views/CustomerReceiptsView/CustomerReceipts.vue'),
+    props: true
+  },
+  {
     path: '/customer/edit/:id',
     name: 'customer-edit',
     component: () => import('@/views/CustomerEditView/CustomerEdit.vue'),
@@ -50,15 +62,21 @@ const routes = [
     component: () => import('@/views/ReceiptsView/ReceiptsAll.vue')
   },
   {
-    path: '/debt-receipt',
-    name: 'debt-receipt',
-    component: () => import('@/views/DebtReceiptView/DebtReceipt.vue')
-  },
-  {
-    path: '/receivable-receipt',
-    name: 'receivable-receipt',
-    component: () => import('@/views/ReceivableReceiptView/ReceivableReceipt.vue')
+    path: '/receipt/:id',
+    name: 'receipt-details',
+    component: () => import('@/views/ReceiptDetailsView/ReceiptDetails.vue'),
+    props: true
   }
+  // {
+  //   path: '/debt-receipt',
+  //   name: 'debt-receipt',
+  //   component: () => import('@/views/DebtReceiptView/DebtReceipt.vue')
+  // },
+  // {
+  //   path: '/receivable-receipt',
+  //   name: 'receivable-receipt',
+  //   component: () => import('@/views/ReceivableReceiptView/ReceivableReceipt.vue')
+  // }
 ]
 
 const router = createRouter({
@@ -71,6 +89,8 @@ router.beforeEach(
     const authStore = useAuthStore()
     const { _user: user } = storeToRefs(authStore)
     const authNotRequiredRoutes: string[] = ['auth']
+
+    checkTokenValidity()
 
     if (user.value === null && !authNotRequiredRoutes.includes(to.name?.toString() ?? '')) {
       next({ name: 'auth' })

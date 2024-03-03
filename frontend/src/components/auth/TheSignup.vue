@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12 col-sm-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
+  <div>
     <div class="card card-body rounded-top-0 border-top-0 shadow py-5">
       <FormKit
         type="form"
@@ -17,7 +17,7 @@
         <FormKit
           type="text"
           name="companyName"
-          label="Firma Adı"
+          label="Firma Adı / Müşteri Adı"
           validation="required"
           v-model="signupModel.companyName"
         />
@@ -48,7 +48,7 @@
         <FormKit
           type="text"
           name="vergino"
-          label="Vergi Numarası"
+          label="Vergi No / TC No"
           validation="number|required|length:10,11|matches:/[0-9]/"
           v-model="signupModel.taxNumber"
         />
@@ -72,6 +72,14 @@
           v-model="signupModel.password"
         />
         <FormKit
+          type="password"
+          name="password_confirm"
+          label="Şifreyi Onayla"
+          validation="required|confirm"
+          validation-visibility="live"
+          validation-label="Password confirmation"
+        />
+        <FormKit
           type="submit"
           label="Hesap Oluştur"
           :classes="{
@@ -87,13 +95,16 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
-import { reactive, ref, computed } from 'vue'
+import { reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-
 import vData from '@/data/vergi_daireleri.json'
 import ilData from '@/data/iller.json'
 import { storeToRefs } from 'pinia'
-import { useToastStore } from '@/stores/toast'
+import { v4 as uuidv4 } from 'uuid'
+import { useToast } from 'vue-toastification'
+declare var bootstrap: any
+
+// console.log(uuidv4())
 
 const signupModel = reactive({
   userName: '',
@@ -110,41 +121,43 @@ const vDaireleri = computed(() => {
 
 const iller: Array<any> = ilData.data
 
+const toast = useToast()
 const router = useRouter()
 const authStore = useAuthStore()
 const { _statusCode: statusCode } = storeToRefs(authStore)
-const toastStore = useToastStore()
-toastStore.setToastHeader('Kayıt Bilgisi')
-const toggleToast = () => toastStore.toggleToast()
 
 const signup = async () => {
   if (signupModel.userName !== '' || signupModel.password !== '') {
-    await authStore.signup({ ...signupModel, createdAt: new Date().toISOString() }).then(() => {
-      toastStore.setStatusCode(statusCode.value)
-      toggleToast()
-      if (statusCode.value === 201) {
-        toastStore.setToastContent('Kayıt Başarılı!')
+    const id = uuidv4()
+    await authStore
+      .signup({ ...signupModel, createdAt: new Date().toISOString(), id: id })
+      .then(() => {
+        if (statusCode.value === 201) {
+          toast.success('Kayıt Başarılı!', {
+            timeout: 2000
+          })
+          setTimeout(() => {
+            router.push({ name: 'home' })
+          }, 3000)
+        } else if (statusCode.value === 1003) {
+          toast.error('Kullanıcı adı kullanımaktadır!', {
+            timeout: 2000
+          })
+        } else if (statusCode.value === 1004) {
+          toast.error('Vergi numarası kullanılmaktadır!', {
+            timeout: 2000
+          })
+        } else {
+          toast.error('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz', {
+            timeout: 2000
+          })
+        }
         setTimeout(() => {
-          toggleToast()
-          router.push({ name: 'home' })
-        }, 3000)
-      } else if (statusCode.value === 1003) {
-        toastStore.setToastContent('Kullanıcı adı kullanımakta!')
-        setTimeout(() => {
-          toggleToast()
-        }, 3000)
-      } else if (statusCode.value === 1004) {
-        toastStore.setToastContent('Vergi numarası kullanılmakta!')
-        setTimeout(() => {
-          toggleToast()
-        }, 3000)
-      } else {
-        toastStore.setToastContent('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz')
-        setTimeout(() => {
-          toggleToast()
-        }, 3000)
-      }
-    })
+          authStore.$patch({
+            statusCode: 0
+          })
+        }, 2000)
+      })
   }
 }
 </script>

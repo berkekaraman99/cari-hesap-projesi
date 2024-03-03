@@ -1,4 +1,5 @@
 export interface SignUpModel {
+  id: string
   companyName: string
   userName: string
   password: string

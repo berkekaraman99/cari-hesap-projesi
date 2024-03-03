@@ -1,24 +1,27 @@
 <template>
-  <Transition name="toast">
-    <div class="custom-toast" v-if="showToast">
-      <div class="card overflow-hidden">
-        <div
-          class="text-white py-2 px-3"
-          :class="{
-            'bg-success': statusCode === 200 || statusCode === 201,
-            'bg-danger': statusCode !== 200 && statusCode !== 201
-          }"
-        >
-          <div class="d-flex align-items-center justify-content-between">
-            <strong>{{ header }}</strong>
-          </div>
-        </div>
-        <div class="toast-content py-2 px-3">
-          <div class="fw-medium text-center">{{ content }}</div>
-        </div>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div
+      id="liveToast"
+      class="toast"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      data-bs-delay="2000"
+    >
+      <div
+        class="toast-header text-white"
+        :class="{
+          'bg-success': statusCode === 200 || statusCode === 201,
+          'bg-danger': statusCode !== 200 && statusCode !== 201
+        }"
+      >
+        <strong class="me-auto">{{ header }}</strong>
+        <small>şimdi</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
+      <div class="toast-body">{{ content }}</div>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -27,7 +30,6 @@ import { storeToRefs } from 'pinia'
 
 const toastStore = useToastStore()
 const {
-  _showToast: showToast,
   _statusCode: statusCode,
   _toastContent: content,
   _toastHeader: header
