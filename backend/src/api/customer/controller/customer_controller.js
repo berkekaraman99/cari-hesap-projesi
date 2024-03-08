@@ -43,6 +43,20 @@ export const createCustomer = async (req, res, next) => {
   }
 };
 
+export const deleteCustomer = async (req, res, next) => {
+  try {
+    const { customerId } = req.body;
+
+    await db.query({
+      sql: "UPDATE customers SET is_deleted = ? WHERE customer_id = ?",
+      values: [1, customerId],
+    });
+    res.status(200).json(BaseResponse.success("Customer deleted successfully!", 200));
+  } catch (error) {
+    res.status(500).json(BaseResponse.fail(error.message, error.statusCode));
+  }
+};
+
 export const updateCustomer = async (req, res, next) => {
   try {
     const { customerId, customerName, taxAdministration, taxAdministrationCity, taxNumber } = req.body;
@@ -74,11 +88,10 @@ export const getCustomerById = async (req, res, next) => {
 
 export const getCustomers = async (req, res, next) => {
   try {
-    const { userId } = req.query;
-    const query = "SELECT * FROM customers WHERE connected_user_id = ?";
+    const query = "SELECT * FROM customers WHERE is_deleted != 1";
     const [customers] = await db.query({
       sql: query,
-      values: [userId],
+      values: [],
     });
     console.log(customers);
     res.status(200).json(BaseResponse.success(customers, 200));
@@ -104,8 +117,8 @@ export const getCustomerReceiptCount = async (req, res, next) => {
   try {
     const { customerId } = req.query;
     const [receiptCount] = await db.query({
-      sql: "SELECT COUNT(*) AS receipt_count, SUM(CASE WHEN type = 1 then 1 else 0 end) as alacak_count, SUM(CASE WHEN type = 2 then 1 else 0 end) as borc_count FROM receipts WHERE customer_id = ?",
-      values: [customerId],
+      sql: "SELECT COUNT(*) AS receipt_count, SUM(CASE WHEN receipt_type = 1 then 1 else 0 end) as alacak_count, SUM(CASE WHEN receipt_type = 2 then 1 else 0 end) as borc_count FROM receipts WHERE customer_id = ? && receipts.is_deleted = ?",
+      values: [customerId, 0],
     });
 
     return res.status(200).json(BaseResponse.success(receiptCount, 200));
@@ -122,6 +135,58 @@ export const fetchReceipts = async (req, res, next) => {
       values: [customerId, 0],
     });
     return res.status(200).json(BaseResponse.success(receipts, 200));
+  } catch (e) {
+    return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
+  }
+};
+
+export const getDebtReceiptTotalPrice = async (req, res, next) => {
+  try {
+    const { year, customer_id } = req.query;
+    const [totalPrice] = await db.query({
+      sql: `SELECT
+              EXTRACT(MONTH FROM created_date) AS month,
+              EXTRACT(YEAR FROM created_date) AS year,
+              SUM(price) AS total_borc
+            FROM
+              caritestdb.receipts
+            WHERE
+              receipt_type = ? && EXTRACT(YEAR FROM created_date) = ? && customer_id = ? && is_deleted = ?
+            GROUP BY
+                EXTRACT(MONTH FROM created_date),
+                EXTRACT(YEAR FROM created_date)
+            ORDER BY
+                EXTRACT(YEAR FROM created_date),
+                EXTRACT(MONTH FROM created_date)`,
+      values: [2, year, customer_id, 0],
+    });
+    return res.status(200).json(BaseResponse.success(totalPrice, 200));
+  } catch (e) {
+    return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
+  }
+};
+
+export const getReceivableReceiptTotalPrice = async (req, res, next) => {
+  try {
+    const { year, customer_id } = req.query;
+    const [totalPrice] = await db.query({
+      sql: `SELECT
+              EXTRACT(MONTH FROM created_date) AS month,
+              EXTRACT(YEAR FROM created_date) AS year,
+              SUM(price) AS total_alacak
+            FROM
+              caritestdb.receipts
+            WHERE
+              receipt_type = ? && EXTRACT(YEAR FROM created_date) = ? && customer_id = ? && is_deleted = ?
+            GROUP BY
+                EXTRACT(MONTH FROM created_date),
+                EXTRACT(YEAR FROM created_date)
+            ORDER BY
+                EXTRACT(YEAR FROM created_date),
+                EXTRACT(MONTH FROM created_date)`,
+      values: [1, year, customer_id, 0],
+    });
+    return res.status(200).json(BaseResponse.success(totalPrice, 200));
   } catch (e) {
     return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
   }

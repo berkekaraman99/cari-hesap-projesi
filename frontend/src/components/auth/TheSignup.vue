@@ -10,7 +10,7 @@
           classes: {
             outer: 'mx-auto',
             wrapper: 'mx-auto',
-            message: 'text-center'
+            message: 'text-center fw-bold'
           }
         }"
       >
@@ -25,7 +25,6 @@
           type="select"
           name="city"
           label="Vergi Dairesi Şehir"
-          placeholder="Vergi Dairesi Şehir"
           v-model="signupModel.taxAdministrationCity"
         >
           <option v-for="il in iller" :value="il.il_adi" v-bind:key="il.plaka">
@@ -33,6 +32,7 @@
           </option>
         </FormKit>
         <FormKit
+          v-if="signupModel.taxAdministrationCity != ''"
           type="select"
           name="tax-administration"
           label="Vergi Dairesi"
@@ -95,14 +95,13 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
-import { reactive, computed, onMounted } from 'vue'
+import { reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import vData from '@/data/vergi_daireleri.json'
 import ilData from '@/data/iller.json'
 import { storeToRefs } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import { useToast } from 'vue-toastification'
-declare var bootstrap: any
 
 // console.log(uuidv4())
 
@@ -162,4 +161,8 @@ const signup = async () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.formkit-message {
+  font-weight: bold;
+}
+</style>

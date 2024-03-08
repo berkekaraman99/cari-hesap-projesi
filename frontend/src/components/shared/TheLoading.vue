@@ -1,13 +1,23 @@
 <template>
+  <div class="loading-backdrop"></div>
   <div class="loading-spinner">
     <div class="lds-dual-ring"></div>
-    <div class="fw-bold">Yükleniyor...</div>
+    <!-- <div class="fw-bold">Yükleniyor...</div> -->
   </div>
 </template>
 
 <script setup lang="ts"></script>
 
 <style scoped>
+.loading-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: 9;
+  background-color: rgba(0, 0, 0, 0.6);
+}
 .loading-spinner {
   position: absolute;
   top: 50%;

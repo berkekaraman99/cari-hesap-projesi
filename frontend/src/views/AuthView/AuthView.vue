@@ -25,7 +25,9 @@
             </div>
           </div>
         </div>
-        <component :is="component" />
+        <KeepAlive>
+          <component :is="component" />
+        </KeepAlive>
       </div>
     </div>
   </div>

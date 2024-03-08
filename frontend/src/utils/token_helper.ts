@@ -1,19 +1,24 @@
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { instance } from './network_manager'
-import SecureLS from 'secure-ls'
+
+const removeFromStorage = async (key: string) => {
+  const encryptedValue = localStorage.getItem(key)
+  if (encryptedValue) {
+    localStorage.removeItem(key)
+  }
+}
 
 export const checkTokenValidity = async () => {
   // Erişim token'ını al
   const authStore = useAuthStore()
   const { _accessToken: token } = storeToRefs(authStore)
   const accessToken = token.value
-  const ls = new SecureLS({ isCompression: false })
 
   // Eğer token yoksa veya süresi dolmuşsa, yeniden kimlik doğrulama yapılmalıdır.
   if (!accessToken || isTokenExpired(accessToken)) {
     // Yeniden kimlik doğrulama işlemleri...
-    ls.remove('authStore')
+    await removeFromStorage('authStore')
     useAuthStore().$reset()
     instance.defaults.headers['Authorization'] = null
   }

@@ -1,26 +1,56 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 @import url('./normalize.scss');
 @import url('./transitions.scss');
+
+$primary-color-h: rgb(33, 58, 87);
+$primary-color-l: rgb(38, 68, 102);
+$secondary-color-h: #9c25b5;
+$secondary-color-l: #68339d;
+$background-secondary: rgb(243, 243, 243);
+$textcolor-light: rgb(250, 250, 250);
+$textcolor-dark: rgb(24, 24, 24);
+$brand-color-h: #f1916d;
+$brand-color-l: rgb(245, 215, 219);
+
 :root {
-  --primary-color-h: #5193b3;
-  --primary-color-l: #64c4c3;
-  --secondary-color-h: #f8d49a;
-  --secondary-color-l: #f8e6cb;
-  --background-secondary: #f3f3f3;
-  --textcolor-light: #fff;
-  --textcolor-dark: #181818;
+  --primary-color-h: #{$primary-color-h};
+  --primary-color-l: #{$primary-color-l};
+  --secondary-color-h: #{$secondary-color-h};
+  --secondary-color-l: #{$secondary-color-l};
+  --background-secondary: #{$background-secondary};
+  --textcolor-light: #{$textcolor-light};
+  --textcolor-dark: #{$textcolor-dark};
+  --brand-color-h: #{$brand-color-h};
+  --brand-color-l: #{$brand-color-l};
 
   @media (prefers-color-scheme: dark) {
-    --fk-color-input: #fff;
+    --fk-color-input: var(--textcolor-light);
     select.formkit-input option {
       color: #000 !important;
     }
   }
 
   @media (prefers-color-scheme: light) {
-    --fk-color-input: #000;
+    --fk-color-input: var(--textcolor-dark);
+    color: #fff !important;
   }
+  --fk-color-placeholder: lightgrey;
+  --fk-bg-button: var(--primary-color-h);
 }
+
+@import 'bootstrap/scss/_functions';
+@import 'bootstrap/scss/_variables';
+
+$primary: $primary-color-h;
+
+$theme-colors: map-merge(
+  $theme-colors,
+  (
+    'primary': $primary
+  )
+);
+
+@import 'bootstrap';
 
 * {
   font-family: 'Roboto', sans-serif;
@@ -53,8 +83,14 @@ a {
 a.router-link-active,
 a.router-link-exact-active {
   font-weight: bold;
-  color: var(--primary-color-h);
+
   border-radius: 0.5rem;
+  @media (prefers-color-scheme: dark) {
+    color: var(--secondary-color-h);
+  }
+  @media (prefers-color-scheme: light) {
+    color: var(--primary-color-h);
+  }
 
   & .sidebar-item {
     @media (prefers-color-scheme: dark) {
@@ -67,32 +103,11 @@ a.router-link-exact-active {
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
-.brand {
-  font-family: 'Lobster', cursive;
-  cursor: pointer;
-  background: linear-gradient(
-    to right,
-    var(--secondary-color-l),
-    var(--secondary-color-h),
-    var(--primary-color-l),
-    var(--primary-color-h)
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0px 0px 0px black);
-}
 
 .auth-brand {
   font-family: 'Lobster', cursive;
   user-select: none;
-  background: linear-gradient(
-    to right,
-    var(--secondary-color-l),
-    var(--secondary-color-h),
-    var(--primary-color-l),
-    var(--primary-color-h)
-  );
+  background: linear-gradient(to right, var(--brand-color-l), var(--brand-color-h));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -115,4 +130,14 @@ a.router-link-exact-active {
 .doc-image {
   height: 5rem;
   object-fit: contain;
+}
+
+#myChart {
+  width: 100%;
+  max-height: 500px;
+}
+
+i {
+  width: 1.75rem;
+  text-align: center;
 }

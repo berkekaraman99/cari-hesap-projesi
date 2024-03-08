@@ -10,9 +10,9 @@
         >
           <i class="fa-solid fa-bars fa-lg"></i>
         </span>
-        <RouterLink class="text-decoration-none me-3" :to="{ name: 'home' }">
+        <a class="text-decoration-none me-3" @click="router.push({ name: 'home' })">
           <span class="header-brand">Cari Takip</span>
-        </RouterLink>
+        </a>
 
         <!-- <button
           class="navbar-toggler"
@@ -27,27 +27,20 @@
         </button> -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent" v-if="user != null">
           <ul class="navbar-nav me-auto mb-2 mb-sm-0">
-            <li class="nav-item me-2"><i class="fa-solid fa-city"></i></li>
+            <li class="nav-item"><i class="fa-solid fa-city"></i></li>
             <li class="nav-item">{{ user.company_name }}</li>
           </ul>
         </div>
         <div class="dropdown">
-          <a
-            class="nav-link dropdown-toggle"
-            href="#"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
+          <a class="nav-link" href="#" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-circle-user fa-xl"></i
           ></a>
 
           <ul class="dropdown-menu dropdown-menu-end">
-            <li class="dropdown-item">
-              <i class="fa-solid fa-city me-2"></i> {{ user.company_name }}
-            </li>
+            <li class="dropdown-item"><i class="fa-solid fa-city"></i> {{ user.company_name }}</li>
             <li>
-              <a class="dropdown-item text-danger" href="#" @click="logout()"
-                ><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Çıkış Yap</a
+              <a class="dropdown-item text-danger fw-bold" href="#" @click="logout()"
+                ><i class="fa-solid fa-arrow-right-from-bracket"></i>Çıkış Yap</a
               >
             </li>
           </ul>
@@ -58,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+import router from '@/router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 
@@ -73,13 +67,7 @@ const logout = () => {
 .header-brand {
   font-family: 'Lobster', cursive;
   cursor: pointer;
-  background: linear-gradient(
-    to right,
-    var(--secondary-color-l),
-    var(--secondary-color-h),
-    var(--primary-color-l),
-    var(--primary-color-h)
-  );
+  background: linear-gradient(to right, var(--brand-color-l), var(--brand-color-h));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -90,7 +78,12 @@ const logout = () => {
     filter: drop-shadow(1px 0px 0px rgba(0, 0, 0, 0.7));
   }
   font-size: 1.35rem;
+
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 }
+
 .cs-nav {
   padding: 0.75rem 0.75rem;
 
@@ -105,8 +98,11 @@ const logout = () => {
   cursor: pointer;
 
   &:hover {
-    background-color: var(--secondary-color-h);
-    color: #0f0f0f;
+    background-color: var(--primary-color-h);
+
+    &:active {
+      background-color: var(--primary-color-l);
+    }
   }
 }
 

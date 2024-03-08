@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import TheHeader from '@/components/header/TheHeader.vue'
+import TheHeader from '@/components/layouts/TheHeader.vue'
 import TheSidebar from '@/components/sidebar/TheSidebar.vue'
 import { watchEffect } from 'vue'
 import { onMounted } from 'vue'
+import TheFooter from './components/layouts/TheFooter.vue'
 
 let body: HTMLElement | null
-let bg: HTMLElement | null
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ matches }) => {
   if (matches) {
@@ -18,15 +18,12 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ({ 
 
 onMounted(() => {
   body = document.querySelector('body')
-  bg = document.getElementById('bg-wallpaper')
 
   watchEffect(() => {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       body?.setAttribute('data-bs-theme', 'dark')
-      // bg!.style.backgroundImage = "url('@/assets/images/dark-wallpaper.jpg')"
     } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
       body?.setAttribute('data-bs-theme', 'light')
-      // bg!.style.backgroundImage = "url('@/assets/images/light-wallpaper.jpg')"
     }
   })
 })
@@ -34,18 +31,19 @@ onMounted(() => {
 
 <template>
   <div id="bg-wallpaper"></div>
-  <div class="min-vh-100">
+  <div class="min-vh-100 position-relative">
     <Transition name="headerAnimation">
       <TheHeader v-if="$route.name !== 'auth'" />
     </Transition>
     <TheSidebar />
-    <div class="container-lg px-md-3">
+    <div id="main" class="container-lg px-md-3">
       <RouterView v-slot="{ Component }">
         <Transition name="customAnimation" mode="out-in">
           <component :is="Component" />
         </Transition>
       </RouterView>
     </div>
+    <TheFooter v-if="$route.name !== 'auth'" />
   </div>
 </template>
 
@@ -57,8 +55,9 @@ onMounted(() => {
   @media (prefers-color-scheme: light) {
     background-image: url('./assets/images/light-wallpaper.jpg');
   }
+
+  background-size: auto;
   background-position: center;
-  background-size: cover;
   background-repeat: no-repeat;
   object-fit: cover;
   position: fixed;
@@ -68,5 +67,10 @@ onMounted(() => {
   bottom: 0;
   z-index: -2;
   filter: blur(8px);
+  height: 100vh;
+}
+
+#main {
+  padding-bottom: 7.5rem;
 }
 </style>

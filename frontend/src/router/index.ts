@@ -59,12 +59,18 @@ const routes = [
   {
     path: '/receipts',
     name: 'receipts',
-    component: () => import('@/views/ReceiptsView/ReceiptsAll.vue')
+    component: () => import('@/views/ReceiptsView/ReceiptsView.vue')
   },
   {
     path: '/receipt/:id',
     name: 'receipt-details',
     component: () => import('@/views/ReceiptDetailsView/ReceiptDetails.vue'),
+    props: true
+  },
+  {
+    path: '/receipt/:id/edit',
+    name: 'receipt-edit',
+    component: () => import('@/views/ReceiptEditView/ReceiptEdit.vue'),
     props: true
   }
   // {

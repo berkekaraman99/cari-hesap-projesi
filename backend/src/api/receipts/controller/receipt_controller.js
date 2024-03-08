@@ -4,7 +4,7 @@ import { createReceiptValidator } from "../validators/create_receipt_validator.j
 
 export const createReceipt = async (req, res, next) => {
   try {
-    const { receiptId, userId, customerId, createdDate, documentNo, price, description, type } = req.body;
+    const { receiptId, userId, customerId, createdDate, documentNo, price, description, receipt_type, paymentMethod } = req.body;
 
     await createReceiptValidator
       .validate({
@@ -16,8 +16,8 @@ export const createReceipt = async (req, res, next) => {
       });
 
     await db.query({
-      sql: "INSERT INTO receipts (receipt_id, customer_id, user_id, description, document_no, price, created_date, receipt_type, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      values: [receiptId, customerId, userId, description, documentNo, price, createdDate, type, 0],
+      sql: "INSERT INTO receipts (receipt_id, customer_id, user_id, description, document_no, price, created_date, receipt_type, payment_method, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      values: [receiptId, customerId, userId, description, documentNo, price, createdDate, receipt_type, paymentMethod, 0],
     });
 
     return res.status(201).json(BaseResponse.success("Receipt created successfully!", 201));
@@ -67,12 +67,12 @@ export const deleteReceipt = async (req, res, next) => {
 
 export const updateReceipt = async (req, res, next) => {
   try {
-    const {} = req.body;
+    const { receiptId, userId, customerId, createdDate, price, description, receipt_type, paymentMethod } = req.body;
     await db.query({
-      sql: "UPDATE receipts SET ... WHERE receipt_id = ?",
-      values: [],
+      sql: "UPDATE receipts SET customer_id = ?, created_date = ?, price = ?, description = ?, payment_method = ?, receipt_type = ? WHERE receipt_id = ?",
+      values: [customerId, createdDate, price, description, paymentMethod, receipt_type, receiptId],
     });
-    res.status(200).json(BaseResponse.fail("Receipt updated successfully!", 200));
+    res.status(201).json(BaseResponse.success("Receipt updated successfully!", 200));
   } catch (error) {
     res.status(500).json(BaseResponse.fail(error.message, error.statusCode));
   }
@@ -81,7 +81,8 @@ export const updateReceipt = async (req, res, next) => {
 export const getReceiptCount = async (req, res, next) => {
   try {
     const [receiptCount] = await db.query({
-      sql: "SELECT COUNT(*) AS receipt_count, SUM(CASE WHEN receipt_type = 1 then 1 else 0 end) as alacak_count, SUM(CASE WHEN receipt_type = 2 then 1 else 0 end) as borc_count FROM receipts",
+      sql: "SELECT COUNT(*) AS receipt_count, SUM(CASE WHEN receipt_type = 1 then 1 else 0 end) as alacak_count, SUM(CASE WHEN receipt_type = 2 then 1 else 0 end) as borc_count FROM receipts WHERE is_deleted = ?",
+      values: [0],
     });
 
     return res.status(200).json(BaseResponse.success(receiptCount, 200));
@@ -101,14 +102,14 @@ export const getReceivableReceiptTotalPrice = async (req, res, next) => {
             FROM
               caritestdb.receipts
             WHERE
-              receipt_type = ? && EXTRACT(YEAR FROM created_date) = ?
+              receipt_type = ? && EXTRACT(YEAR FROM created_date) = ? && is_deleted = ?
             GROUP BY
                 EXTRACT(MONTH FROM created_date),
                 EXTRACT(YEAR FROM created_date)
             ORDER BY
                 EXTRACT(YEAR FROM created_date),
                 EXTRACT(MONTH FROM created_date)`,
-      values: [1, year],
+      values: [1, year, 0],
     });
     return res.status(200).json(BaseResponse.success(totalPrice, 200));
   } catch (e) {
@@ -127,14 +128,14 @@ export const getDebtReceiptTotalPrice = async (req, res, next) => {
             FROM
               caritestdb.receipts
             WHERE
-              receipt_type = ? && EXTRACT(YEAR FROM created_date) = ?
+              receipt_type = ? && EXTRACT(YEAR FROM created_date) = ? && is_deleted = ?
             GROUP BY
                 EXTRACT(MONTH FROM created_date),
                 EXTRACT(YEAR FROM created_date)
             ORDER BY
                 EXTRACT(YEAR FROM created_date),
                 EXTRACT(MONTH FROM created_date)`,
-      values: [2, year],
+      values: [2, year, 0],
     });
     return res.status(200).json(BaseResponse.success(totalPrice, 200));
   } catch (e) {

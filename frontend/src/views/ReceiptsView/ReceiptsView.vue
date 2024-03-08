@@ -1,30 +1,36 @@
 <template>
   <div>
-    <h1 class="my-4 ps-2">Tanımlı Müşteriler</h1>
+    <h1 class="my-4 ps-2">Tüm Dekontlar</h1>
     <div class="row">
       <div class="col">
         <table
-          class="table table-striped table-responsive border shadow"
-          v-if="customers.length !== 0"
+          id="receiptsTable"
+          class="table table-hover border table-responsive shadow"
+          v-if="receipts.length !== 0"
         >
           <thead>
             <tr>
-              <th class="col" @click="sortTable(0)">Müşteri/Firma Adı</th>
-              <th class="col" @click="sortTable(1)">Vergi Dairesi Şehri</th>
-              <th class="col" @click="sortTable(2)">Vergi Dairesi</th>
-              <th class="col" @click="sortTable(3)">
-                <div>Vergi Numarası</div>
-                <div>TCNO</div>
+              <th class="col" @click="sortTable(0)">
+                <div>Firma Adı</div>
+                <div>Vergi No</div>
               </th>
-              <th class="col" @click="sortTable(4)">İşlemler</th>
+              <th class="col" @click="sortTable(1)">Dekont No</th>
+              <th class="col" @click="sortTable(2)">Dekont Tarihi</th>
+              <th class="col" @click="sortTable(3)">Tutar</th>
+              <th class="col" @click="sortTable(4)">Dekont Türü</th>
+              <th class="col" @click="sortTable(5)">İşlemler</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="customer in customers" v-bind:key="customer.customer_id">
-              <td>{{ customer.customer_name }}</td>
-              <td>{{ customer.tax_number }}</td>
-              <td>{{ customer.tax_administration_city }}</td>
-              <td>{{ customer.tax_administration }}</td>
+            <tr v-for="receipt in receipts" v-bind:key="receipt.receipt_id">
+              <td>
+                <div>{{ receipt.customer_name }}</div>
+                <div>{{ receipt.tax_number }}</div>
+              </td>
+              <td>{{ receipt.receipt_id }}</td>
+              <td>{{ receipt.created_date }}</td>
+              <td>{{ receipt.price + ' ₺' }}</td>
+              <td>{{ docType(receipt.receipt_type) }}</td>
               <td>
                 <div class="dropdown-center">
                   <button
@@ -36,29 +42,40 @@
                     İşlem
                   </button>
                   <ul class="dropdown-menu px-2">
-                    <li class="my-1" v-for="item in dropdownItems">
+                    <li class="my-1">
                       <RouterLink
+                        :to="{ name: 'receipt-details', params: { id: receipt.receipt_id } }"
                         class="dropdown-item"
-                        :to="{ name: item.routeName, params: { id: customer.customer_id } }"
                       >
                         <div class="py-1 d-flex align-items-center">
-                          <i class="me-2" :class="item.icon"></i>
-                          <div>{{ item.actionName }}</div>
+                          <i class="fa-solid fa-info me-2"></i>
+                          <div>Dekontu Görüntüle</div>
                         </div>
                       </RouterLink>
                     </li>
                     <li class="my-1">
-                      <div class="dropdown-item">
+                      <RouterLink
+                        class="dropdown-item"
+                        :to="{ name: 'receipt-edit', params: { id: receipt.receipt_id } }"
+                      >
+                        <div class="py-1 d-flex align-items-center">
+                          <i class="fa-solid fa-pen-to-square me-2"></i>
+                          <div>Dekontu Düzenle</div>
+                        </div>
+                      </RouterLink>
+                    </li>
+                    <li class="my-1">
+                      <a class="dropdown-item" href="#">
                         <div
                           class="py-1 d-flex align-items-center"
                           data-bs-toggle="modal"
                           data-bs-target="#confirmModal"
-                          @click="selectCustomer(customer.customer_id)"
+                          @click="selectReceipt(receipt.receipt_id)"
                         >
                           <i class="fa-solid fa-trash-can me-2"></i>
-                          Sil
+                          <div>Dekontu Sil</div>
                         </div>
-                      </div>
+                      </a>
                     </li>
                   </ul>
                 </div>
@@ -66,10 +83,9 @@
             </tr>
           </tbody>
         </table>
-        <h2 class="text-center fw-light my-3" v-else>Tanımlı müşteri bulunamadı</h2>
+        <h2 class="text-center fw-light my-3" v-else>Dekont bulunamadı</h2>
       </div>
     </div>
-    <!-- Modal -->
     <Teleport to="body">
       <div
         class="modal fade"
@@ -89,13 +105,13 @@
                 aria-label="Close"
               ></button>
             </div>
-            <div class="modal-body">Müşteriyi silmek istediğinize emin misiniz?</div>
+            <div class="modal-body">Dekontu silmek istediğinize emin misiniz?</div>
             <div class="modal-footer">
               <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Vazgeç</button>
               <button
                 type="button"
                 class="btn btn-danger"
-                @click="deleteCustomer()"
+                @click="deleteReceipt()"
                 data-bs-dismiss="modal"
               >
                 Sil
@@ -111,36 +127,32 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
-import { useCustomerStore } from '@/stores/customer'
+import { useReceiptStore } from '@/stores/receipt'
 import { storeToRefs } from 'pinia'
-import { onMounted, ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { useToast } from 'vue-toastification'
 
 const toast = useToast()
+const receiptStore = useReceiptStore()
 const authStore = useAuthStore()
-const customerStore = useCustomerStore()
 
 const { _user: user } = storeToRefs(authStore)
-const { _customers: customers } = storeToRefs(customerStore)
-
-const getCustomers = async () => {
-  await customerStore.fetchCustomers(user.value.id)
-}
+const { _receipts: receipts } = storeToRefs(receiptStore)
 
 const isDeleting = ref(false)
-const selectedCustomerId = ref('')
+const selectedReceiptId = ref('')
 
-const selectCustomer = (customerId: string) => {
-  selectedCustomerId.value = customerId
+const selectReceipt = (id: string) => {
+  selectedReceiptId.value = id
 }
 
-const deleteCustomer = async () => {
+const deleteReceipt = async () => {
   isDeleting.value = true
-  await customerStore
-    .deleteCustomer(selectedCustomerId.value)
+  await receiptStore
+    .deleteReceipt(selectedReceiptId.value)
     .then(async () => {
-      toast.success('Müşteri başarıyla silindi.', { timeout: 2000 })
-      await getCustomers()
+      toast.success('Dekont başarıyla silindi.', { timeout: 2000 })
+      await fetchReceipts()
     })
     .catch((_) => {
       toast.error('Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.', { timeout: 2000 })
@@ -148,20 +160,21 @@ const deleteCustomer = async () => {
     .finally(() => (isDeleting.value = false))
 }
 
-onMounted(() => getCustomers())
+const fetchReceipts = async () => {
+  await receiptStore.fetchReceipts(user.value.id).catch((_) => {
+    toast.error('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.', {
+      timeout: 2500
+    })
+  })
+}
 
-const dropdownItems = [
-  {
-    routeName: 'customer-edit',
-    actionName: 'Düzenle',
-    icon: 'fa-solid fa-pen-to-square'
-  },
-  {
-    routeName: 'customer-details',
-    actionName: 'Görüntüle',
-    icon: 'fa-solid fa-info'
-  }
-]
+const docType = (receiptType: number) => {
+  return receiptType === 1 ? 'Alacak' : 'Borç'
+}
+
+onBeforeMount(async () => {
+  await fetchReceipts()
+})
 
 const sortTable = (n: number) => {
   let table: HTMLElement,
@@ -242,6 +255,7 @@ th {
   &:last-child {
     border-top-right-radius: 0.5rem;
   }
+  cursor: pointer;
 }
 
 tr {
@@ -260,9 +274,12 @@ thead tr th {
   background-color: transparent;
   color: var(--textcolor-light);
 }
-
 thead {
-  background-image: linear-gradient(90deg, var(--primary-color-h) 0%, var(--primary-color-l) 100%);
+  background-image: linear-gradient(
+    90deg,
+    var(--secondary-color-h) 0%,
+    var(--secondary-color-l) 100%
+  );
 }
 
 th,
@@ -298,6 +315,5 @@ td {
     background-color: var(--primary-color-l);
     border-color: var(--primary-color-l);
   }
-  color: var(--textcolor-light) !important;
 }
 </style>

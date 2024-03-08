@@ -5,11 +5,11 @@
     id="offcanvasSidebar"
     aria-labelledby="offcanvasSidebarLabel"
   >
-    <div class="offcanvas-header">
-        <div class="fs-2 brand ps-3" id="offcanvasSidebarLabel">Cari Takip</div>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-   
+    <div class="offcanvas-header mt-1">
+        <div class="fs-2 sidebar-brand ps-3" id="offcanvasSidebarLabel">Cari Takip</div>
+        <button type="button" class="btn-close me-1" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
+
     <div class="offcanvas-body">
       <RouterLink :to="{ name: 'home' }">
         <p class="sidebar-item" data-bs-toggle="offcanvas"
@@ -40,7 +40,7 @@
       </div>
       </p>
       <div class="collapse" id="collapseReceipts">
-        <div class="sidebar-item-dropdown p-2">
+        <div class="sidebar-item-dropdown p-2 bg-body">
           <RouterLink :to="{ name: 'receipts'}">
             <p class="sidebar-item" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar">
               <i class="fa-solid fa-receipt"></i> Tüm Dekontlar
@@ -75,6 +75,9 @@
   transition: 0.3s ease;
   background-color: transparent;
   cursor: pointer;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 
     &:hover {
       background-color: var(--primary-color-h);
@@ -88,15 +91,39 @@
   border-radius: 0.5rem;
   border: 1px solid ;
   overflow: hidden;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 
   @media (prefers-color-scheme: dark) {
-      border-color: rgb(35, 35, 35);
-    }
-    @media (prefers-color-scheme: light) {
-      border-color: rgb(230, 230, 230);
-    }
+    border-color: rgb(35, 35, 35);
+  }
+  @media (prefers-color-scheme: light) {
+    border-color: rgb(230, 230, 230);
+  }
 }
+
 p i {
   margin-right: 0.5rem;
 }
+
+.sidebar-brand {
+  font-family: 'Lobster', cursive;
+  cursor: pointer;
+  background: linear-gradient(to right, var(--brand-color-l), var(--brand-color-h));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+
+  @media (prefers-color-scheme: dark) {
+    filter: drop-shadow(1px 0px 0px rgba(255, 255, 255, 0.7));
+  }
+  @media (prefers-color-scheme: light) {
+    filter: drop-shadow(1px 0px 0px rgba(0, 0, 0, 0.7));
+  }
+}
+
 </style>

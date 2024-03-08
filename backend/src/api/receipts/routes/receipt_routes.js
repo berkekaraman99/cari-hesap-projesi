@@ -7,6 +7,7 @@ import {
   getReceiptById,
   getReceiptCount,
   getReceivableReceiptTotalPrice,
+  updateReceipt,
 } from "../controller/receipt_controller.js";
 
 import authorizationMiddleware from "../../../features/middlewares/authorization_middleware.js";
@@ -21,5 +22,6 @@ ReceiptRoutes.get("/get-debt-total-price", authorizationMiddleware, getDebtRecei
 ReceiptRoutes.get("/get-receivable-total-price", authorizationMiddleware, getReceivableReceiptTotalPrice);
 ReceiptRoutes.get("/get-receipt-by-id", authorizationMiddleware, getReceiptById);
 ReceiptRoutes.post("/delete-receipt", authorizationMiddleware, deleteReceipt);
+ReceiptRoutes.post("/update-receipt", authorizationMiddleware, updateReceipt);
 
 export default ReceiptRoutes;

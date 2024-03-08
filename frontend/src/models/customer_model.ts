@@ -1,5 +1,4 @@
 interface ICustomer {
-  connected_user_id: string
   createdAt: string
   customer_id: string
   customer_name: string

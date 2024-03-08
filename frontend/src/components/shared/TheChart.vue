@@ -108,6 +108,7 @@ const getDataAndInitChart = async () => {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             title: {
               display: true,
@@ -142,10 +143,15 @@ const updateChart = async () => {
   chart.destroy()
   getDataAndInitChart()
 }
-
 onMounted(async () => {
   ctx = document.getElementById('myChart')
   getDataAndInitChart()
+})
+
+window.addEventListener('resize', function () {
+  ctx.style.width = window.innerWidth
+
+  ctx.style.height = window.innerHeight
 })
 </script>
 

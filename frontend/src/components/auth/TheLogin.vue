@@ -10,7 +10,7 @@
           classes: {
             outer: 'mx-auto',
             wrapper: 'mx-auto',
-            message: 'text-center'
+            message: 'text-center fw-bold'
           }
         }"
       >
@@ -18,7 +18,6 @@
           type="text"
           name="username"
           label="Kullanıcı Adı"
-          placeholder="Kullanıcı Adı"
           validation="required"
           v-model="userName"
         />
@@ -30,7 +29,6 @@
           :validation-messages="{
             matches: 'Please include at least one symbol'
           }"
-          placeholder="Şifre"
           v-model="password"
         />
         <FormKit
@@ -49,11 +47,9 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
-// import { useToastStore } from '@/stores/toast'
 import { storeToRefs } from 'pinia'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-// declare var bootstrap: any
 import { useToast } from 'vue-toastification'
 
 const toast = useToast()
@@ -63,25 +59,6 @@ const authStore = useAuthStore()
 const { _statusCode: statusCode } = storeToRefs(authStore)
 const userName = ref<string>('')
 const password = ref<string>('')
-
-// const toastStore = useToastStore()
-// toastStore.setToastHeader('Giriş Bilgisi')
-
-// let toastTrigger
-// let toastLiveExample
-
-// onMounted(() => {
-//   toastTrigger = document.getElementById('liveToastBtn') as HTMLElement
-//   toastLiveExample = document.getElementById('liveToast') as HTMLElement
-
-//   console.log(toastTrigger)
-//   console.log(toastLiveExample)
-// })
-
-// const handleToast = () => {
-//   const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample!)
-//   toastBootstrap.show()
-// }
 
 const login = async () => {
   if (userName.value !== '' || password.value !== '') {
@@ -100,8 +77,13 @@ const login = async () => {
               router.push({ name: 'home' })
             }, 3000)
             break
-          default:
+          case 1001:
             toast.error('Kullanıcı adı veya şifre hatalı!', {
+              timeout: 2500
+            })
+            break
+          default:
+            toast.error('Bir sorun oluştu. Lütfen daha sonra tekrar deneyiniz.', {
               timeout: 2500
             })
             break

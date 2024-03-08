@@ -8,7 +8,7 @@ export const formkitConfig = defaultConfig({
   plugins: [
     createMultiStepPlugin(),
     createFloatingLabelsPlugin({
-      useAsDefault: false
+      useAsDefault: true
     })
   ],
   messages: {

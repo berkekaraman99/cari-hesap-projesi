@@ -1,7 +1,7 @@
 <template>
   <div class="col-12 col-sm-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
     <h1>Dekont Oluştur</h1>
-    <form @submit.prevent="sendReceipt()">
+    <form @submit.prevent="updateReceipt()">
       <div class="card card-body table-responsive">
         <table class="table table-borderless table-hover">
           <tr>
@@ -103,14 +103,14 @@
           </tr>
         </table>
         <div class="d-flex align-items-center justify-content-end">
-          <FormKit type="submit" label="Oluştur" :disabled="statusCode === 200" />
+          <FormKit type="submit" label="Kaydet" :disabled="statusCode === 200" />
           <FormKit
             type="button"
-            label="Temizle"
+            label="Vazgeç"
             :classes="{
               input: 'bg-secondary'
             }"
-            @click="clearInputs()"
+            @click="goBack()"
           />
         </div>
       </div>
@@ -120,20 +120,23 @@
 
 <script setup lang="ts">
 import router from '@/router'
-import { useAuthStore } from '@/stores/auth'
 import { useCustomerStore } from '@/stores/customer'
 import { useReceiptStore } from '@/stores/receipt'
 import { storeToRefs } from 'pinia'
-import { ref, reactive, onBeforeUnmount } from 'vue'
+import { ref, reactive, onBeforeUnmount, onMounted, onBeforeMount } from 'vue'
 import { useToast } from 'vue-toastification'
-import { v4 as uuidv4 } from 'uuid'
 
 const toast = useToast()
 
+const props = defineProps({
+  id: {
+    type: String,
+    required: true
+  }
+})
+
 const receiptStore = useReceiptStore()
-const { _statusCode: statusCode } = storeToRefs(receiptStore)
-const authStore = useAuthStore()
-const { _user: user } = storeToRefs(authStore)
+const { _statusCode: statusCode, _receipt: receipt } = storeToRefs(receiptStore)
 const customerStore = useCustomerStore()
 const { _searchedCustomers: searchedCustomers } = storeToRefs(customerStore)
 
@@ -141,7 +144,6 @@ const latestDate = new Date()
 latestDate.setDate(latestDate.getDate() + 1)
 
 const maxDate = latestDate.toISOString().slice(0, 10)
-const currentDate = new Date().toISOString().slice(0, 10)
 
 const customerName = ref('')
 
@@ -160,30 +162,27 @@ const docType = (receiptType: number) => {
 }
 
 const receiptForm = reactive({
-  userId: user.value.id,
+  userId: '',
   customerId: '',
-  createdDate: currentDate,
+  createdDate: '',
   price: '',
   description: '',
-  paymentMethod: 'Cash',
-  receipt_type: 1
+  paymentMethod: '',
+  receipt_type: 0
 })
 
-const clearInputs = () => {
-  receiptForm.customerId = ''
-  receiptForm.createdDate = currentDate
-  receiptForm.price = ''
-  receiptForm.description = ''
+const goBack = () => {
+  router.back()
 }
 
-const sendReceipt = async () => {
+const updateReceipt = async () => {
   receiptForm.customerId = searchedCustomers.value[0].customer_id
-  const id = uuidv4()
+
   await receiptStore
-    .createReceipt({ ...receiptForm, receiptId: new Date().getTime(), documentNo: id })
+    .updateReceipt({ ...receiptForm, receiptId: receipt.value.receipt_id })
     .then(() => {
-      if (statusCode.value === 201) {
-        toast.success('Dekont başarıyla oluşturuldu!', {
+      if (statusCode.value === 200 || statusCode.value === 201) {
+        toast.success('Dekont başarıyla kaydedildi!', {
           timeout: 2500
         })
         setTimeout(() => {
@@ -201,6 +200,23 @@ onBeforeUnmount(() => {
   customerStore.$patch({
     searchedCustomers: []
   })
+})
+
+onBeforeMount(async () => {
+  await receiptStore.getReceiptById(props.id).then(() => {
+    receiptForm.userId = receipt.value.user_id
+    receiptForm.createdDate = receipt.value.created_date
+    receiptForm.customerId = receipt.value.customer_id
+    receiptForm.description = receipt.value.description
+    receiptForm.price = receipt.value.price
+    receiptForm.receipt_type = receipt.value.receipt_type
+    receiptForm.paymentMethod = receipt.value.payment_method
+    customerName.value = receipt.value.customer_name
+  })
+})
+
+onMounted(() => {
+  console.log(receipt.value)
 })
 </script>
 

@@ -1,161 +1,163 @@
 <template>
-  <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
-    <h1>Firma Profili</h1>
-    <Transition name="fade" mode="out-in">
-      <div class="card card-body tw-shadow-md" v-if="!isEditable">
-        <table>
-          <tbody>
-            <tr>
-              <td><b>Kullanıcı Adı:</b></td>
-              <td>
-                <input
-                  class="form-control"
-                  type="text"
-                  :disabled="!isEditable"
-                  v-model="userModel.userName"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td><b>Firma Adı:</b></td>
-              <td>
-                <input
-                  class="form-control"
-                  type="text"
-                  :disabled="!isEditable"
-                  v-model="userModel.companyName"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td><b>Vergi Dairesi Şehri:</b></td>
-              <td>
-                <input
-                  class="form-control"
-                  type="text"
-                  :disabled="!isEditable"
-                  v-model="userModel.taxAdministrationCity"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td><b>Vergi Dairesi:</b></td>
-              <td>
-                <input
-                  class="form-control"
-                  type="text"
-                  :disabled="!isEditable"
-                  v-model="userModel.taxAdministration"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td><b>Vergi No/TC No:</b></td>
-              <td>
-                <input
-                  class="form-control"
-                  type="text"
-                  :disabled="!isEditable"
-                  v-model="userModel.taxNumber"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="text-center mt-3" v-if="!isEditable">
-          <FormKit
-            type="button"
-            label="Bilgileri Düzenle"
-            :classes="{
-              outer: 'mx-auto',
-              wrapper: 'mx-auto text-center'
-            }"
-            @click="toggleEdit()"
-          />
+  <div class="col-12">
+    <h1 class="my-4 text-center">Firma Profili</h1>
+    <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
+      <Transition name="fade" mode="out-in">
+        <div class="card card-body tw-shadow-md" v-if="!isEditable">
+          <table>
+            <tbody>
+              <tr>
+                <td><b>Kullanıcı Adı:</b></td>
+                <td>
+                  <input
+                    class="form-control"
+                    type="text"
+                    :disabled="!isEditable"
+                    v-model="userModel.userName"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td><b>Firma Adı:</b></td>
+                <td>
+                  <input
+                    class="form-control"
+                    type="text"
+                    :disabled="!isEditable"
+                    v-model="userModel.companyName"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td><b>Vergi Dairesi Şehri:</b></td>
+                <td>
+                  <input
+                    class="form-control"
+                    type="text"
+                    :disabled="!isEditable"
+                    v-model="userModel.taxAdministrationCity"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td><b>Vergi Dairesi:</b></td>
+                <td>
+                  <input
+                    class="form-control"
+                    type="text"
+                    :disabled="!isEditable"
+                    v-model="userModel.taxAdministration"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td><b>Vergi No/TC No:</b></td>
+                <td>
+                  <input
+                    class="form-control"
+                    type="text"
+                    :disabled="!isEditable"
+                    v-model="userModel.taxNumber"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-center mt-3" v-if="!isEditable">
+            <FormKit
+              type="button"
+              label="Bilgileri Düzenle"
+              :classes="{
+                outer: 'mx-auto',
+                wrapper: 'mx-auto text-center'
+              }"
+              @click="toggleEdit()"
+            />
+          </div>
         </div>
-      </div>
 
-      <div class="card card-body tw-shadow-sm" v-else>
-        <FormKit
-          type="form"
-          id="auth"
-          @submit="updateInfo"
-          :actions="false"
-          :config="{
-            classes: {
-              outer: 'mx-auto',
-              wrapper: 'mx-auto',
-              message: 'text-center'
-            }
-          }"
-        >
+        <div class="card card-body tw-shadow-sm" v-else>
           <FormKit
-            type="text"
-            name="username"
-            label="Kullanıcı Adı"
-            validation="required|length:6"
-            validation-visibility="live"
-            v-model="userModel.userName"
-          />
-          <FormKit
-            type="text"
-            name="companyName"
-            label="Firma Adı / Müşteri Adı"
-            validation="required"
-            v-model="userModel.companyName"
-          />
-          <FormKit
-            type="select"
-            name="city"
-            label="Vergi Dairesi Şehir"
-            placeholder="Vergi Dairesi Şehir"
-            v-model="userModel.taxAdministrationCity"
+            type="form"
+            id="auth"
+            @submit="updateInfo"
+            :actions="false"
+            :config="{
+              classes: {
+                outer: 'mx-auto',
+                wrapper: 'mx-auto',
+                message: 'text-center'
+              }
+            }"
           >
-            <option v-for="il in iller" :value="il.il_adi" v-bind:key="il.plaka">
-              {{ il.il_adi }}
-            </option>
-          </FormKit>
-          <FormKit
-            type="select"
-            name="tax-administration"
-            label="Vergi Dairesi"
-            placeholder="Vergi Dairesi"
-            v-model="userModel.taxAdministration"
-          >
-            <template v-for="vDaire in vDaireleri" :key="vDaire.id">
-              <option>
-                {{ vDaire.vergi_dairesi + ' Vergi Dairesi' }}
+            <FormKit
+              type="text"
+              name="username"
+              label="Kullanıcı Adı"
+              validation="required|length:6"
+              validation-visibility="live"
+              v-model="userModel.userName"
+            />
+            <FormKit
+              type="text"
+              name="companyName"
+              label="Firma Adı / Müşteri Adı"
+              validation="required"
+              v-model="userModel.companyName"
+            />
+            <FormKit
+              type="select"
+              name="city"
+              label="Vergi Dairesi Şehir"
+              placeholder="Vergi Dairesi Şehir"
+              v-model="userModel.taxAdministrationCity"
+            >
+              <option v-for="il in iller" :value="il.il_adi" v-bind:key="il.plaka">
+                {{ il.il_adi }}
               </option>
-            </template>
+            </FormKit>
+            <FormKit
+              type="select"
+              name="tax-administration"
+              label="Vergi Dairesi"
+              placeholder="Vergi Dairesi"
+              v-model="userModel.taxAdministration"
+            >
+              <template v-for="vDaire in vDaireleri" :key="vDaire.id">
+                <option>
+                  {{ vDaire.vergi_dairesi + ' Vergi Dairesi' }}
+                </option>
+              </template>
+            </FormKit>
+            <FormKit
+              type="text"
+              name="vergino"
+              label="Vergi No / TC No"
+              validation="number|required|length:10,11|matches:/[0-9]/"
+              v-model="userModel.taxNumber"
+            />
+            <FormKit
+              type="submit"
+              label="Değişiklikleri Kaydet"
+              :classes="{
+                outer: 'mx-auto',
+                wrapper: 'mx-auto text-center'
+              }"
+              :disabled="statusCode === 201 || statusCode === 200"
+            />
+            <FormKit
+              type="button"
+              label="Vazgeç"
+              :classes="{
+                outer: 'mx-auto',
+                wrapper: 'mx-auto text-center'
+              }"
+              @click="toggleEdit()"
+            />
           </FormKit>
-          <FormKit
-            type="text"
-            name="vergino"
-            label="Vergi No / TC No"
-            validation="number|required|length:10,11|matches:/[0-9]/"
-            v-model="userModel.taxNumber"
-          />
-          <FormKit
-            type="submit"
-            label="Değişiklikleri Kaydet"
-            :classes="{
-              outer: 'mx-auto',
-              wrapper: 'mx-auto text-center'
-            }"
-            :disabled="statusCode === 201 || statusCode === 200"
-          />
-          <FormKit
-            type="button"
-            label="Vazgeç"
-            :classes="{
-              outer: 'mx-auto',
-              wrapper: 'mx-auto text-center'
-            }"
-            @click="toggleEdit()"
-          />
-        </FormKit>
-      </div>
-    </Transition>
+        </div>
+      </Transition>
+    </div>
   </div>
 </template>
 

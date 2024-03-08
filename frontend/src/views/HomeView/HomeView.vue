@@ -6,7 +6,11 @@ import { onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 
 const receiptStore = useReceiptStore()
-const { _receiptCount: receiptCount } = storeToRefs(receiptStore)
+const {
+  _receiptCount: receiptCount,
+  _totalDebtPrice: totalDebtPrice,
+  _totalReceivablePrice: totalReceivablePrice
+} = storeToRefs(receiptStore)
 
 const router = useRouter()
 
@@ -22,9 +26,9 @@ const goToCustomers = () => {
 <template>
   <main>
     <div>
-      <h1>Ana Sayfa</h1>
+      <h1 class="my-4 ps-2">Ana Sayfa</h1>
     </div>
-    <div>
+    <div class="card px-4 py-3 bg-body-secondary">
       <div class="row row-cols-1 row-cols-md-2 my-2">
         <div class="col-12 col-sm-12 col-md-4">
           <div class="row">
@@ -71,7 +75,10 @@ const goToCustomers = () => {
               <div class="card card-body">
                 <div class="row">
                   <div class="col-12 col-lg-6">
-                    <h4 class="text-center">Borç Dekont Sayısı: {{ receiptCount.borc_count }}</h4>
+                    <h4 class="text-center">
+                      Borç Dekont Sayısı:
+                      {{ receiptCount.borc_count == null ? 0 : receiptCount.borc_count }}
+                    </h4>
                   </div>
                   <div class="col-12 col-lg-6 d-flex align-items-center justify-content-center">
                     <img src="../../assets/images/outbox.png" alt="inbox debt" class="doc-image" />
@@ -82,6 +89,7 @@ const goToCustomers = () => {
           </div>
         </div>
         <TheChart />
+        <div class="col-12 col-md-8"></div>
       </div>
     </div>
   </main>

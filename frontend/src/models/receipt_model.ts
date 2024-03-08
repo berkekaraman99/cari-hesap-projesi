@@ -5,5 +5,6 @@ interface IReceipt {
   document_no: string
   price: number
   description: string
-  type: number
+  receipt_type: number
+  payment_method: string
 }

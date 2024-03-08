@@ -39,6 +39,26 @@ export const useReceiptStore = defineStore('receiptStore', {
       }
     },
 
+    async deleteReceipt(receiptId: string) {
+      try {
+        const response = await instance.post('/receipts/delete-receipt', { receiptId })
+        console.log(response.data)
+        this.statusCode = response.data.statusCode
+      } catch (error: any) {
+        console.error(error.response)
+      }
+    },
+
+    async updateReceipt(receipt: any) {
+      try {
+        const response = await instance.post('/receipts/update-receipt', receipt)
+        console.log(response.data)
+        this.statusCode = response.data.statusCode
+      } catch (error: any) {
+        console.error(error.response)
+      }
+    },
+
     async getReceiptCount() {
       try {
         const response = await instance.get('/receipts/get-receipt-count')
@@ -74,15 +94,6 @@ export const useReceiptStore = defineStore('receiptStore', {
         const response = await instance.get(`/receipts/get-receipt-by-id?receiptId=${id}`)
         console.log(response.data)
         this.receipt = response.data.data
-      } catch (error: any) {
-        console.error(error.response)
-      }
-    },
-
-    async deleteReceipt(id: string) {
-      try {
-        const response = await instance.post('/receipts/delete-receipt', { receiptId: id })
-        console.log(response.data)
       } catch (error: any) {
         console.error(error.response)
       }

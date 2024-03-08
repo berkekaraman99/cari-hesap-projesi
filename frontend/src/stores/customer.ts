@@ -3,12 +3,14 @@ import { instance } from '@/utils/network_manager'
 
 export const useCustomerStore = defineStore('customerStore', {
   state: () => ({
-    customer: {} as ICustomer,
+    customer: {} as ICustomer | null,
     customers: [] as Array<ICustomer>,
     customerReceipts: [] as Array<any>,
     statusCode: 0 as number,
     searchedCustomers: [] as Array<ICustomer>,
-    receiptCount: 0 as any
+    receiptCount: 0 as any,
+    totalDebtPrice: [] as any,
+    totalReceivablePrice: [] as any
   }),
   getters: {
     _customer: (state: any) => state.customer as ICustomer,
@@ -16,7 +18,9 @@ export const useCustomerStore = defineStore('customerStore', {
     _customers: (state: any) => state.customers as Array<ICustomer>,
     _customerReceipts: (state: any) => state.customerReceipts as Array<any>,
     _searchedCustomers: (state: any) => state.searchedCustomers as Array<ICustomer>,
-    _receiptCount: (state: any) => state.receiptCount as any
+    _receiptCount: (state: any) => state.receiptCount as any,
+    _totalDebtPrice: (state: any) => state.totalDebtPrice as any,
+    _totalReceivablePrice: (state: any) => state.totalReceivablePrice as any
   },
   actions: {
     async createCustomer(customer: ICustomerCreate) {
@@ -41,6 +45,16 @@ export const useCustomerStore = defineStore('customerStore', {
         setTimeout(() => {
           this.statusCode = 0
         }, 3000)
+      }
+    },
+    async deleteCustomer(customerId: string) {
+      try {
+        const response = await instance.post('/customer/delete-customer', {
+          customerId
+        })
+        console.log(response.data)
+      } catch (error: any) {
+        console.error(error.response)
       }
     },
     async fetchCustomers(userId: string) {
@@ -102,6 +116,29 @@ export const useCustomerStore = defineStore('customerStore', {
         const response = await instance.get(`/customer/fetch-receipts?customerId=${id}`)
         this.customerReceipts = response.data.data
         console.log(this.customerReceipts)
+      } catch (error: any) {
+        console.error(error.response)
+      }
+    },
+    async getDebtTotalPrice(year: number, customerId: string) {
+      try {
+        const response = await instance.get(
+          `/customer/get-customer-total-debt-price?year=${year}&customer_id=${customerId}`
+        )
+        console.log(response.data)
+        this.totalDebtPrice = response.data.data
+      } catch (error: any) {
+        console.error(error.response)
+      }
+    },
+
+    async getReceivableTotalPrice(year: number, customerId: string) {
+      try {
+        const response = await instance.get(
+          `/customer/get-customer-total-receivable-price?year=${year}&customer_id=${customerId}`
+        )
+        console.log(response.data)
+        this.totalReceivablePrice = response.data.data
       } catch (error: any) {
         console.error(error.response)
       }

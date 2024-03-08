@@ -2,10 +2,18 @@ import type { LoginModel } from '@/models/login_model'
 import type { SignUpModel } from '@/models/signup_model'
 import { defineStore } from 'pinia'
 import { instance } from '@/utils/network_manager'
-import SecureLS from 'secure-ls'
 import type { AuthUser } from '@/models/auth_user_model'
 
-const ls = new SecureLS({ isCompression: false })
+import CryptoJS from 'crypto-js'
+
+const encryptionKey = import.meta.env.ENCRYPTION_KEY ?? 'mysecretkey 123'
+
+const removeFromStorage = async (key: string) => {
+  const encryptedValue = localStorage.getItem(key)
+  if (encryptedValue) {
+    localStorage.removeItem(key)
+  }
+}
 
 export const useAuthStore = defineStore('authStore', {
   state: () => ({
@@ -64,7 +72,7 @@ export const useAuthStore = defineStore('authStore', {
       }
     },
     async logout() {
-      ls.remove('authStore')
+      await removeFromStorage('authStore')
       useAuthStore().$reset()
       instance.defaults.headers['Authorization'] = null
       location.reload()
@@ -90,8 +98,18 @@ export const useAuthStore = defineStore('authStore', {
   },
   persist: {
     storage: {
-      getItem: (key) => ls.get(key),
-      setItem: (key, value) => ls.set(key, value)
+      getItem: (key) => {
+        const encryptedValue = localStorage.getItem(key)
+        if (encryptedValue) {
+          const bytes = CryptoJS.AES.decrypt(encryptedValue, encryptionKey)
+          return bytes.toString(CryptoJS.enc.Utf8)
+        }
+        return null
+      },
+      setItem: (key, value) => {
+        const encryptedValue = CryptoJS.AES.encrypt(value, encryptionKey).toString()
+        localStorage.setItem(key, encryptedValue)
+      }
     }
   }
 })

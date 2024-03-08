@@ -1,19 +1,35 @@
 <template>
   <div>
     <h1>Dekont Detayları</h1>
-    <div class="card">
-      <div class="container px-4 py-3">
-        <div class="row rounded-3 py-2 mb-2 shadow-sm">
+    <div class="card card-body shadow-sm">
+      <div class="container">
+        <div class="row py-2 mb-2">
           <div class="col">
-            <h2>Müşteri Adı: {{ receipt.customer_name }}</h2>
-            <h2>Dekont Türü: {{ docType(receipt.type) }}</h2>
-            <h2>Tarih: {{ receipt.created_date }}</h2>
-            <h2>Tutar: {{ receipt.price + ' TL' }}</h2>
-            <h2>Açıklama: {{ receipt.description }}</h2>
+            <h3>
+              Müşteri Adı: <span>{{ receipt.customer_name }}</span>
+            </h3>
+            <h3>
+              Dekont Türü: <span>{{ docType(receipt.type) }}</span>
+            </h3>
+            <h3>
+              Tarih: <span>{{ receipt.created_date }}</span>
+            </h3>
+            <h3>
+              Tutar: <span>{{ receipt.price + '₺' }}</span>
+            </h3>
+            <h3>
+              Açıklama: <span>{{ receipt.description }}</span>
+            </h3>
           </div>
         </div>
       </div>
     </div>
+    <!-- <div class="my-3 d-flex justify-content-end">
+      <RouterLink :to="{ name: 'receipt-edit', params: { id: props.id } }"
+        ><button class="btn btn-primary">Dekontu Düzenle</button></RouterLink
+      >
+      <button class="btn btn-danger ms-3">Dekontu Sil</button>
+    </div> -->
   </div>
 </template>
 
@@ -41,4 +57,8 @@ const docType = (receiptType: number) => {
 const { _receipt: receipt } = storeToRefs(receiptStore)
 </script>
 
-<style scoped></style>
+<style scoped>
+h3 span {
+  font-weight: normal;
+}
+</style>

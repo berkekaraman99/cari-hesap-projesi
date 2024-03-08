@@ -125,15 +125,12 @@ import { reactive, computed } from 'vue'
 import vData from '@/data/vergi_daireleri.json'
 import ilData from '@/data/iller.json'
 import { useCustomerStore } from '@/stores/customer'
-import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 
 const toast = useToast()
-const authStore = useAuthStore()
-const { _user: user } = storeToRefs(authStore)
 const customerStore = useCustomerStore()
 const { _statusCode: statusCode } = storeToRefs(customerStore)
 const router = useRouter()
@@ -149,7 +146,7 @@ const customerForm = reactive({
   taxAdministration: '',
   taxAdministrationCity: '',
   taxNumber: '',
-  customerType: ''
+  customerType: 'company'
 })
 
 const resetForm = () => {
@@ -166,7 +163,6 @@ const createCustomer = async () => {
     await customerStore
       .createCustomer({
         ...customerForm,
-        connectedUserId: user.value.id,
         customerId: customerId,
         createdAt: new Date().toISOString()
       })
