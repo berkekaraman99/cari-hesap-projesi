@@ -10,14 +10,14 @@
         <div>
           <div class="main-tab border">
             <div
-              class="tab"
+              class="tab bg-body"
               :class="{ active: component == TheLogin }"
               @click="toggleComponent(TheLogin)"
             >
               Giriş Yap
             </div>
             <div
-              class="tab"
+              class="tab bg-body"
               :class="{ active: component == TheSignup }"
               @click="toggleComponent(TheSignup)"
             >
@@ -68,12 +68,5 @@ const toggleComponent = (value: any) => {
   padding: 0.8rem 0rem;
   text-align: center;
   width: 100%;
-
-  @media (prefers-color-scheme: dark) {
-    background-color: #040404;
-  }
-  @media (prefers-color-scheme: light) {
-    background-color: #fbfbfb;
-  }
 }
 </style>
