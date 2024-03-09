@@ -69,8 +69,8 @@
 }
 
 .sidebar-item {
-  padding: 0.5rem 0.75rem;
-  margin: 0.2rem 0;
+  padding: 0.65rem 0.75rem;
+  margin: 0.3rem 0;
   border-radius: 0.5rem;
   transition: 0.3s ease;
   background-color: transparent;

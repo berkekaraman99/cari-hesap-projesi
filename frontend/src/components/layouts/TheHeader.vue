@@ -32,7 +32,7 @@
           </ul>
         </div>
         <div class="dropdown">
-          <a class="nav-link" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+          <a class="nav-link user-icon" href="#" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-circle-user fa-xl"></i
           ></a>
 
