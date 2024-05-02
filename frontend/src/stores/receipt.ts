@@ -8,7 +8,9 @@ export const useReceiptStore = defineStore('receiptStore', {
     statusCode: 0 as number,
     receiptCount: 0 as any,
     totalDebtPrice: [] as any,
-    totalReceivablePrice: [] as any
+    totalReceivablePrice: [] as any,
+    qrCode: null as any,
+    receiptReport: [] as Array<any>
   }),
   getters: {
     _receipt: (state: any) => state.receipt as any,
@@ -16,7 +18,9 @@ export const useReceiptStore = defineStore('receiptStore', {
     _statusCode: (state: any) => state.statusCode as number,
     _receiptCount: (state: any) => state.receiptCount as any,
     _totalDebtPrice: (state: any) => state.totalDebtPrice as any,
-    _totalReceivablePrice: (state: any) => state.totalReceivablePrice as any
+    _totalReceivablePrice: (state: any) => state.totalReceivablePrice as any,
+    _qrCode: (state: any) => state.qrCode as any,
+    _receiptReport: (state: any) => state.receiptReport as any
   },
   actions: {
     async createReceipt(receiptModel: any) {
@@ -94,6 +98,33 @@ export const useReceiptStore = defineStore('receiptStore', {
         const response = await instance.get(`/receipts/get-receipt-by-id?receiptId=${id}`)
         console.log(response.data)
         this.receipt = response.data.data
+      } catch (error: any) {
+        console.error(error.response)
+      }
+    },
+
+    async getQrCode(id: string) {
+      try {
+        const response = await instance.get(`/receipts/get-qr-code?id=${id}`)
+        console.log(response.data)
+        this.qrCode = response.data
+      } catch (error: any) {
+        console.error(error.response)
+      }
+    },
+
+    async getReceiptReport(sort: {
+      sortBy: string
+      sort: string
+      startDate: string
+      endDate: string
+    }) {
+      try {
+        const response = await instance.get(
+          `/receipts/get-receipt-report?sortBy=${sort.sortBy}&sort=${sort.sort}&startDate=${sort.startDate}&endDate=${sort.endDate}`
+        )
+        console.log(response.data)
+        this.receiptReport = response.data.data
       } catch (error: any) {
         console.error(error.response)
       }

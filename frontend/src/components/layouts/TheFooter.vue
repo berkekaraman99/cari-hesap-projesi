@@ -1,6 +1,6 @@
 <template>
   <footer
-    class="d-flex flex-wrap justify-content-around align-items-center py-3 my-4 border-top position-absolute bottom-0 w-100"
+    class="d-flex flex-wrap justify-content-around align-items-center py-3 mt-4 mb-0 border-top position-absolute bottom-0 w-100"
   >
     <p class="col-md-4 mb-0 text-muted">© 2024 Cari Takip</p>
 

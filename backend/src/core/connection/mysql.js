@@ -38,7 +38,7 @@ const createTableConnection = mysql.createConnection({
   password: "Skodal9901*",
 });
 
-// Tablo oluşturma sorgusu
+// Tablo oluşturma sorguları
 const createTableUsersQuery = `
 CREATE TABLE IF NOT EXISTS users (
   id varchar(255) NOT NULL,
@@ -95,7 +95,7 @@ createTableConnection.connect((err) => {
   }
   console.log("Connected to MySQL as id " + createTableConnection.threadId);
 
-  // Tablo oluşturma sorgusunu gönderme
+  // Tablo oluşturma sorgularını gönderme
   createTableConnection.query(createTableUsersQuery, (err, results, fields) => {
     if (err) {
       console.error("Error creating table: " + err.stack);
@@ -104,7 +104,6 @@ createTableConnection.connect((err) => {
     console.log("Table created successfully");
   });
 
-  // Tablo oluşturma sorgusunu gönderme
   createTableConnection.query(createTableCustomersQuery, (err, results, fields) => {
     if (err) {
       console.error("Error creating table: " + err.stack);
@@ -113,7 +112,6 @@ createTableConnection.connect((err) => {
     console.log("Table created successfully");
   });
 
-  // Tablo oluşturma sorgusunu gönderme
   createTableConnection.query(createTableReceiptsQuery, (err, results, fields) => {
     if (err) {
       console.error("Error creating table: " + err.stack);
@@ -126,12 +124,13 @@ createTableConnection.connect((err) => {
   });
 });
 
+// Ana connection oluşturulur ve exportlanır
 export const db = mysql
   .createPool({
     host: "localhost",
     port: "3306",
     user: "root",
-    database: "caritakip",
+    database: process.env.DATABASE ?? "caritestdb",
     password: "Skodal9901*",
     waitForConnections: true,
     connectionLimit: 10,

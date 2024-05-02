@@ -1,3 +1,25 @@
+<template>
+  <div id="bg-wallpaper"></div>
+  <div class="min-vh-100 position-relative">
+    <Transition name="headerAnimation">
+      <TheHeader v-if="$route.name !== 'auth'" />
+    </Transition>
+    <TheSidebar />
+    <div
+      id="main"
+      class="container-lg px-md-3"
+      :style="{ 'padding-bottom': $route.name !== 'auth' ? '7.5rem' : '0px' }"
+    >
+      <RouterView v-slot="{ Component }">
+        <Transition name="customAnimation" mode="out-in">
+          <component :is="Component" />
+        </Transition>
+      </RouterView>
+    </div>
+    <TheFooter v-if="$route.name !== 'auth'" />
+  </div>
+</template>
+
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import TheHeader from '@/components/layouts/TheHeader.vue'
@@ -28,24 +50,6 @@ onMounted(() => {
   })
 })
 </script>
-
-<template>
-  <div id="bg-wallpaper"></div>
-  <div class="min-vh-100 position-relative">
-    <Transition name="headerAnimation">
-      <TheHeader v-if="$route.name !== 'auth'" />
-    </Transition>
-    <TheSidebar />
-    <div id="main" class="container-lg px-md-3">
-      <RouterView v-slot="{ Component }">
-        <Transition name="customAnimation" mode="out-in">
-          <component :is="Component" />
-        </Transition>
-      </RouterView>
-    </div>
-    <TheFooter v-if="$route.name !== 'auth'" />
-  </div>
-</template>
 
 <style scoped lang="scss">
 #bg-wallpaper {

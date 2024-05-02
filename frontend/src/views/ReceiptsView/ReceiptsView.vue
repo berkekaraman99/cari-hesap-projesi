@@ -43,15 +43,15 @@
                   </button>
                   <ul class="dropdown-menu px-2">
                     <li class="my-1">
-                      <RouterLink
-                        :to="{ name: 'receipt-details', params: { id: receipt.receipt_id } }"
+                      <a
                         class="dropdown-item"
+                        @click="selectReceipt(receipt.receipt_id), changeReceiptSelected()"
                       >
                         <div class="py-1 d-flex align-items-center">
                           <i class="fa-solid fa-info me-2"></i>
                           <div>Dekontu Görüntüle</div>
                         </div>
-                      </RouterLink>
+                      </a>
                     </li>
                     <li class="my-1">
                       <RouterLink
@@ -74,6 +74,17 @@
                         >
                           <i class="fa-solid fa-trash-can me-2"></i>
                           <div>Dekontu Sil</div>
+                        </div>
+                      </a>
+                    </li>
+                    <li class="my-1">
+                      <a class="dropdown-item" href="#">
+                        <div
+                          class="py-1 d-flex align-items-center"
+                          @click="changeQrOpened(), createQr(receipt.receipt_id)"
+                        >
+                          <i class="fa-solid fa-qrcode me-2"></i>
+                          <div>QR ile Paylaş</div>
                         </div>
                       </a>
                     </li>
@@ -122,6 +133,16 @@
       </div>
     </Teleport>
     <the-loading v-if="isDeleting" />
+    <Transition name="fade">
+      <ReceiptModal
+        :id="selectedReceiptId"
+        @close-dialog="changeReceiptSelected"
+        v-if="receiptSelected"
+      />
+    </Transition>
+    <Transition name="fade">
+      <QrModal v-if="qrOpened" @close-dialog="changeQrOpened" />
+    </Transition>
   </div>
 </template>
 
@@ -131,19 +152,40 @@ import { useReceiptStore } from '@/stores/receipt'
 import { storeToRefs } from 'pinia'
 import { onBeforeMount, ref } from 'vue'
 import { useToast } from 'vue-toastification'
+import ReceiptModal from '@/components/shared/ReceiptModal.vue'
+import QrModal from '@/components/shared/QrModal.vue'
 
 const toast = useToast()
 const receiptStore = useReceiptStore()
 const authStore = useAuthStore()
 
 const { _user: user } = storeToRefs(authStore)
-const { _receipts: receipts } = storeToRefs(receiptStore)
+const { _receipts: receipts, _qrCode: qrCode } = storeToRefs(receiptStore)
 
 const isDeleting = ref(false)
 const selectedReceiptId = ref('')
+const receiptSelected = ref(false)
+
+const createQr = async (id: string) => {
+  await receiptStore.getQrCode(id).then(() => {
+    const image = document.createElement('img')
+    image.src = qrCode.value
+    document.getElementById('qr')?.appendChild(image)
+  })
+}
+
+const qrOpened = ref(false)
+const changeQrOpened = () => {
+  qrOpened.value = !qrOpened.value
+}
+
+const changeReceiptSelected = () => {
+  receiptSelected.value = !receiptSelected.value
+}
 
 const selectReceipt = (id: string) => {
   selectedReceiptId.value = id
+  console.log(selectedReceiptId.value)
 }
 
 const deleteReceipt = async () => {
@@ -315,5 +357,6 @@ td {
     background-color: var(--primary-color-l);
     border-color: var(--primary-color-l);
   }
+  color: var(--textcolor-light) !important;
 }
 </style>

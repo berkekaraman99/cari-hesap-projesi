@@ -5,4 +5,5 @@ export interface AuthUser {
   tax_number: string
   tax_administration: string
   tax_administration_city: string
+  address: string
 }

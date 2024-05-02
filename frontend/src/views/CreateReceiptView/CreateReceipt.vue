@@ -45,7 +45,6 @@
               <div>
                 <FormKit
                   type="date"
-                  value="2011-01-01"
                   name="Tarih"
                   :validation="'required|date_before:' + maxDate"
                   v-model="receiptForm.createdDate"
@@ -94,6 +93,7 @@
               <div>
                 <FormKit
                   type="textarea"
+                  auto-height
                   name="Açıklama"
                   validation="required|length:1"
                   v-model="receiptForm.description"
@@ -127,6 +127,7 @@ import { storeToRefs } from 'pinia'
 import { ref, reactive, onBeforeUnmount } from 'vue'
 import { useToast } from 'vue-toastification'
 import { v4 as uuidv4 } from 'uuid'
+// import Editor from 'primevue/editor'
 
 const toast = useToast()
 
@@ -152,7 +153,7 @@ const searchCustomer = async () => {
 
   timer = setTimeout(async () => {
     await customerStore.searchCustomers(customerName.value)
-  }, 750)
+  }, 500)
 }
 
 const docType = (receiptType: number) => {

@@ -21,19 +21,6 @@ app.use((req, res, next) => {
 
 app.use("/api", RootRoutes);
 
-app.listen(process.env.PORT ?? 3000);
-
-// import fs from "fs";
-
-// const jsonDosya = JSON.parse(fs.readFileSync("iller.json", "utf-8"));
-// const jsonDosya2 = JSON.parse(fs.readFileSync("vergi_daireleri.json", "utf-8"));
-
-// jsonDosya.data.forEach((item) => {
-//   jsonDosya2.data.forEach((item2) => {
-//     if (item.plaka === item2.il_id) {
-//       item2["il_adi"] = item.il_adi;
-//     }
-//   });
-// });
-
-// fs.writeFileSync("vergi_daireleri.json", JSON.stringify(jsonDosya2), "utf-8");
+app.listen(process.env.PORT ?? 3000, () => {
+  console.log("Sunucu çalışıyor");
+});

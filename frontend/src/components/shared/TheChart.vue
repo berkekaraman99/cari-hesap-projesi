@@ -84,25 +84,19 @@ const getDataAndInitChart = async () => {
     })
     .then(() => {
       chart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
           labels: labels.value,
           datasets: [
             {
               label: 'Alacak',
               data: [...receivableData.value],
-              borderWidth: 1,
-              fill: true,
-              cubicInterpolationMode: 'monotone',
-              tension: 0.4
+              borderWidth: 1
             },
             {
               label: 'Borç',
               data: [...debtData.value],
-              borderWidth: 1,
-              cubicInterpolationMode: 'monotone',
-              fill: true,
-              tension: 0.4
+              borderWidth: 1
             }
           ]
         },

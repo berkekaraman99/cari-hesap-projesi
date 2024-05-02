@@ -21,7 +21,7 @@ const routes = [
   {
     path: '/profile',
     name: 'user-profile',
-    component: () => import('@/views/UserProfileView/UserProfile.vue')
+    component: () => import('@/views/CompanyProfileView/CompanyProfile.vue')
   },
   {
     path: '/create-receipt',
@@ -62,16 +62,20 @@ const routes = [
     component: () => import('@/views/ReceiptsView/ReceiptsView.vue')
   },
   {
-    path: '/receipt/:id',
-    name: 'receipt-details',
-    component: () => import('@/views/ReceiptDetailsView/ReceiptDetails.vue'),
-    props: true
-  },
-  {
     path: '/receipt/:id/edit',
     name: 'receipt-edit',
     component: () => import('@/views/ReceiptEditView/ReceiptEdit.vue'),
     props: true
+  },
+  {
+    path: '/receipt/report',
+    name: 'receipt-report',
+    component: () => import('@/views/ReceiptReportView/ReceiptReportView.vue')
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: () => import('@/views/SettingsView/SettingsView.vue')
   }
   // {
   //   path: '/debt-receipt',

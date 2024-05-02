@@ -4,18 +4,19 @@
     <div class="row">
       <div class="col">
         <table
+          id="customersTable"
           class="table table-striped table-responsive border shadow"
           v-if="customers.length !== 0"
         >
           <thead>
             <tr>
               <th class="col" @click="sortTable(0)">Müşteri/Firma Adı</th>
-              <th class="col" @click="sortTable(1)">Vergi Dairesi Şehri</th>
-              <th class="col" @click="sortTable(2)">Vergi Dairesi</th>
-              <th class="col" @click="sortTable(3)">
+              <th class="col" @click="sortTable(1)">
                 <div>Vergi Numarası</div>
                 <div>TCNO</div>
               </th>
+              <th class="col" @click="sortTable(2)">Vergi Dairesi</th>
+              <th class="col" @click="sortTable(3)">Vergi Dairesi Şehri</th>
               <th class="col" @click="sortTable(4)">İşlemler</th>
             </tr>
           </thead>
@@ -173,7 +174,7 @@ const sortTable = (n: number) => {
     shouldSwitch,
     dir,
     switchcount = 0
-  table = document.getElementById('receiptsTable')!
+  table = document.getElementById('customersTable')!
   switching = true
   // Set the sorting direction to ascending:
   dir = 'asc'
@@ -242,6 +243,8 @@ th {
   &:last-child {
     border-top-right-radius: 0.5rem;
   }
+
+  cursor: pointer;
 }
 
 tr {

@@ -99,7 +99,7 @@ export const getUserAfterLogin = async (req, res, next) => {
   try {
     const decodedToken = decodeToken(token);
     const [row] = await db.query({
-      sql: "SELECT id, company_name, user_name, tax_number, tax_administration, tax_administration_city FROM users WHERE id = ?",
+      sql: "SELECT id, company_name, user_name, tax_number, tax_administration, tax_administration_city, address FROM users WHERE id = ?",
       values: [decodedToken.id],
     });
 
@@ -112,11 +112,11 @@ export const getUserAfterLogin = async (req, res, next) => {
 
 export const updateUserInfos = async (req, res, next) => {
   try {
-    const { id, companyName, userName, taxNumber, taxAdministration, taxAdministrationCity } = req.body;
+    const { id, companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, address } = req.body;
 
     await db.query({
-      sql: "UPDATE users SET company_name = ?, user_name = ?, tax_number = ?, tax_administration = ?, tax_administration_city = ? WHERE id = ?",
-      values: [companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, id],
+      sql: "UPDATE users SET company_name = ?, user_name = ?, tax_number = ?, tax_administration = ?, tax_administration_city = ?, address = ? WHERE id = ?",
+      values: [companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, address, id],
     });
 
     return res.status(200).json(BaseResponse.success("Kullanıcı bilgileri başarıyla güncellendi", 200));

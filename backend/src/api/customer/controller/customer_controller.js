@@ -4,7 +4,7 @@ import { createCustomerValidator } from "../validators/create_customer_validator
 
 export const createCustomer = async (req, res, next) => {
   try {
-    const { customerId, customerName, taxAdministration, taxAdministrationCity, taxNumber, createdAt, connectedUserId, customerType } = req.body;
+    const { customerId, customerName, taxAdministration, taxAdministrationCity, taxNumber, createdAt, customerType, address } = req.body;
     await createCustomerValidator
       .validate({
         customerName,
@@ -33,8 +33,8 @@ export const createCustomer = async (req, res, next) => {
     }
 
     await db.query({
-      sql: "INSERT INTO customers (customer_id, customer_name, tax_number, tax_administration, tax_administration_city, created_at, connected_user_id, customer_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      values: [customerId, customerName, taxNumber, taxAdministration, taxAdministrationCity, createdAt, connectedUserId, customerType],
+      sql: "INSERT INTO customers (customer_id, customer_name, tax_number, tax_administration, tax_administration_city, created_at, customer_type, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      values: [customerId, customerName, taxNumber, taxAdministration, taxAdministrationCity, createdAt, customerType, address],
     });
 
     res.status(201).json(BaseResponse.success("Customer created successfully!", 201));
@@ -59,11 +59,11 @@ export const deleteCustomer = async (req, res, next) => {
 
 export const updateCustomer = async (req, res, next) => {
   try {
-    const { customerId, customerName, taxAdministration, taxAdministrationCity, taxNumber } = req.body;
+    const { customerId, customerName, taxAdministration, taxAdministrationCity, taxNumber, address } = req.body;
 
     await db.query({
-      sql: "UPDATE customers SET customer_name = ?, tax_number = ?, tax_administration = ?, tax_administration_city = ? WHERE customer_id = ?",
-      values: [customerName, taxNumber, taxAdministration, taxAdministrationCity, customerId],
+      sql: "UPDATE customers SET customer_name = ?, tax_number = ?, tax_administration = ?, tax_administration_city = ?, address = ? WHERE customer_id = ?",
+      values: [customerName, taxNumber, taxAdministration, taxAdministrationCity, address, customerId],
     });
 
     res.status(201).json(BaseResponse.success("Customer updated successfully!", 201));

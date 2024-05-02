@@ -51,6 +51,11 @@
             data-bs-target="#offcanvasSidebar">
             <i class="fa-solid fa-file-circle-plus"></i> Dekont Oluştur</p>
           </RouterLink>
+          <RouterLink :to="{ name: 'receipt-report' }">
+            <p class="sidebar-item" data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasSidebar">
+            <i class="fa-solid fa-file-circle-plus"></i> Genel Rapor</p>
+          </RouterLink>
         </div>
       </div>
     </div>

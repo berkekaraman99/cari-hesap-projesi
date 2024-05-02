@@ -38,6 +38,9 @@
 
           <ul class="dropdown-menu dropdown-menu-end">
             <li class="dropdown-item"><i class="fa-solid fa-city"></i> {{ user.company_name }}</li>
+            <RouterLink :to="{ name: 'settings' }" class="dropdown-item"
+              ><i class="fa-solid fa-gear"></i> Ayarlar</RouterLink
+            >
             <li>
               <a class="dropdown-item text-danger fw-bold" href="#" @click="logout()"
                 ><i class="fa-solid fa-arrow-right-from-bracket"></i>Çıkış Yap</a

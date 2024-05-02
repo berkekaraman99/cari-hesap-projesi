@@ -1,6 +1,6 @@
 <template>
   <div class="col-12 col-sm-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
-    <h1>Dekont Oluştur</h1>
+    <h1 class="my-4">Dekont Oluştur</h1>
     <form @submit.prevent="updateReceipt()">
       <div class="card card-body table-responsive">
         <table class="table table-borderless table-hover">

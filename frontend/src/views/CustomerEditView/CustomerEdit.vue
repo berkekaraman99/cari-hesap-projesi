@@ -104,6 +104,14 @@
               </div>
             </td>
           </tr>
+          <tr>
+            <th>Adres</th>
+            <td>
+              <div>
+                <FormKit type="text" name="TC No" v-model="customerForm.address" />
+              </div>
+            </td>
+          </tr>
         </table>
         <div class="d-flex align-items-center justify-content-end">
           <FormKit type="submit" label="Kaydet" :disabled="statusCode === 201" />
@@ -157,6 +165,7 @@ const getCustomer = async () => {
     customerForm.taxAdministration = customer.value.tax_administration
     customerForm.taxAdministrationCity = customer.value.tax_administration_city
     customerForm.customerType = customer.value.customer_type
+    customerForm.address = customer.value.address
   })
 }
 
@@ -175,7 +184,8 @@ const customerForm = reactive({
   taxAdministration: '',
   taxAdministrationCity: '',
   taxNumber: '',
-  customerType: ''
+  customerType: '',
+  address: ''
 })
 
 const update = async () => {

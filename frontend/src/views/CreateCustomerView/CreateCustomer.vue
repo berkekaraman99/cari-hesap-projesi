@@ -78,6 +78,14 @@
             </td>
           </tr>
           <tr v-if="customerForm.customerType === 'company'">
+            <th>Adres</th>
+            <td>
+              <div>
+                <FormKit type="text" name="Adres" v-model="customerForm.address" />
+              </div>
+            </td>
+          </tr>
+          <tr v-if="customerForm.customerType === 'company'">
             <th>Vergi No</th>
             <td>
               <div>
@@ -146,7 +154,8 @@ const customerForm = reactive({
   taxAdministration: '',
   taxAdministrationCity: '',
   taxNumber: '',
-  customerType: 'company'
+  customerType: 'company',
+  address: ''
 })
 
 const resetForm = () => {
@@ -155,6 +164,7 @@ const resetForm = () => {
   customerForm.taxNumber = ''
   customerForm.customerType = ''
   customerForm.taxAdministrationCity = ''
+  customerForm.address = ''
 }
 
 const createCustomer = async () => {

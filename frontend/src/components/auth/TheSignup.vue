@@ -17,7 +17,7 @@
         <FormKit
           type="text"
           name="companyName"
-          label="Firma Adı / Müşteri Adı"
+          label="Firma Adı"
           validation="required"
           v-model="signupModel.companyName"
         />
@@ -46,10 +46,11 @@
           </template>
         </FormKit>
         <FormKit
-          type="text"
+          type="number"
           name="vergino"
-          label="Vergi No / TC No"
-          validation="number|required|length:10,11|matches:/[0-9]/"
+          label="Vergi Numarası"
+          min="0"
+          validation="number|required|length:10,10|matches:/[0-9]/"
           v-model="signupModel.taxNumber"
         />
         <FormKit
@@ -58,6 +59,10 @@
           label="Kullanıcı Adı"
           validation="required|length:6"
           validation-visibility="live"
+          :validation-messages="{
+            alpha: 'Kullanıcı adı sadece harflerden oluşabilir.',
+            length: 'Kullanıcı adı en az 6 karakter veya daha fazla olmalıdır.'
+          }"
           v-model="signupModel.userName"
         />
         <FormKit
@@ -66,7 +71,10 @@
           label="Şifre"
           validation="required|length:6|contains_alphanumeric|contains_symbol|contains_uppercase"
           :validation-messages="{
-            matches: 'Please include at least one symbol'
+            contains_symbol: 'Şifre en az bir sembol içermelidir.',
+            contains_uppercase: 'Şifre en az bir büyük harf içermelidir.',
+            contains_alphanumeric: 'Şifre en az bir harf içermelidir.',
+            length: 'Şifre en az 6 karakter veya daha fazla olmalıdır'
           }"
           validation-visibility="live"
           v-model="signupModel.password"
@@ -76,8 +84,7 @@
           name="password_confirm"
           label="Şifreyi Onayla"
           validation="required|confirm"
-          validation-visibility="live"
-          validation-label="Password confirmation"
+          validation-label="Şifre doğrulama"
         />
         <FormKit
           type="submit"
@@ -126,6 +133,7 @@ const authStore = useAuthStore()
 const { _statusCode: statusCode } = storeToRefs(authStore)
 
 const signup = async () => {
+  signupModel.taxNumber = String(signupModel.taxNumber)
   if (signupModel.userName !== '' || signupModel.password !== '') {
     const id = uuidv4()
     await authStore

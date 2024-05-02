@@ -4,8 +4,8 @@
 
 $primary-color-h: rgb(33, 58, 87);
 $primary-color-l: rgb(38, 68, 102);
-$secondary-color-h: #9c25b5;
-$secondary-color-l: #68339d;
+$secondary-color-h: #008be7;
+$secondary-color-l: #006db6;
 $background-secondary: rgb(243, 243, 243);
 $textcolor-light: rgb(250, 250, 250);
 $textcolor-dark: rgb(24, 24, 24);
@@ -140,4 +140,8 @@ a.router-link-exact-active {
 i {
   width: 1.75rem;
   text-align: center;
+}
+
+.formkit-message {
+  font-weight: bold;
 }
