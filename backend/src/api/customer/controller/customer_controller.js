@@ -104,7 +104,7 @@ export const searchCustomers = async (req, res, next) => {
   try {
     const { text } = req.query;
     const [customers] = await db.query({
-      sql: "SELECT * FROM customers WHERE customer_name LIKE ?",
+      sql: "SELECT * FROM customers WHERE customer_name LIKE ? and is_deleted = 0",
       values: ["%" + text + "%"],
     });
     res.status(200).json(BaseResponse.success(customers, 200));
@@ -140,16 +140,16 @@ export const fetchReceipts = async (req, res, next) => {
   }
 };
 
-export const getDebtReceiptTotalPrice = async (req, res, next) => {
+export const getReceiptTotalPrices = async (req, res, next) => {
   try {
     const { year, customer_id } = req.query;
-    const [totalPrice] = await db.query({
+    const [debtTotalPrice] = await db.query({
       sql: `SELECT
               EXTRACT(MONTH FROM created_date) AS month,
               EXTRACT(YEAR FROM created_date) AS year,
               SUM(price) AS total_borc
             FROM
-              caritestdb.receipts
+              receipts
             WHERE
               receipt_type = ? && EXTRACT(YEAR FROM created_date) = ? && customer_id = ? && is_deleted = ?
             GROUP BY
@@ -160,22 +160,13 @@ export const getDebtReceiptTotalPrice = async (req, res, next) => {
                 EXTRACT(MONTH FROM created_date)`,
       values: [2, year, customer_id, 0],
     });
-    return res.status(200).json(BaseResponse.success(totalPrice, 200));
-  } catch (e) {
-    return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
-  }
-};
-
-export const getReceivableReceiptTotalPrice = async (req, res, next) => {
-  try {
-    const { year, customer_id } = req.query;
-    const [totalPrice] = await db.query({
+    const [receivableTotalPrice] = await db.query({
       sql: `SELECT
               EXTRACT(MONTH FROM created_date) AS month,
               EXTRACT(YEAR FROM created_date) AS year,
               SUM(price) AS total_alacak
             FROM
-              caritestdb.receipts
+              receipts
             WHERE
               receipt_type = ? && EXTRACT(YEAR FROM created_date) = ? && customer_id = ? && is_deleted = ?
             GROUP BY
@@ -186,7 +177,7 @@ export const getReceivableReceiptTotalPrice = async (req, res, next) => {
                 EXTRACT(MONTH FROM created_date)`,
       values: [1, year, customer_id, 0],
     });
-    return res.status(200).json(BaseResponse.success(totalPrice, 200));
+    return res.status(200).json(BaseResponse.success({ debtTotalPrice, receivableTotalPrice }, 200));
   } catch (e) {
     return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
   }

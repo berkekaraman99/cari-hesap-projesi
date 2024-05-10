@@ -54,7 +54,7 @@
           <RouterLink :to="{ name: 'receipt-report' }">
             <p class="sidebar-item" data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasSidebar">
-            <i class="fa-solid fa-file-circle-plus"></i> Genel Rapor</p>
+            <i class="fa-solid fa-file-export"></i> Genel Rapor</p>
           </RouterLink>
         </div>
       </div>

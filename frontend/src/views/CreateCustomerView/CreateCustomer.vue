@@ -137,8 +137,12 @@ import { storeToRefs } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from '@/stores/auth'
 
 const toast = useToast()
+
+const authStore = useAuthStore()
+const { _user: user } = storeToRefs(authStore)
 const customerStore = useCustomerStore()
 const { _statusCode: statusCode } = storeToRefs(customerStore)
 const router = useRouter()
@@ -174,6 +178,7 @@ const createCustomer = async () => {
       .createCustomer({
         ...customerForm,
         customerId: customerId,
+        userId: user.value.id,
         createdAt: new Date().toISOString()
       })
       .then(() => {

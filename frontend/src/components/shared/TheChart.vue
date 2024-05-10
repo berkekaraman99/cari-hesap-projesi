@@ -43,12 +43,10 @@ import { useReceiptStore } from '@/stores/receipt'
 import Chart from 'chart.js/auto'
 import { storeToRefs } from 'pinia'
 import { ref, onMounted } from 'vue'
-
 import { Months } from '@/constants/months'
 
 const receiptStore = useReceiptStore()
-const { _totalDebtPrice: totalDebtPrice, _totalReceivablePrice: totalReceivablePrice } =
-  storeToRefs(receiptStore)
+const { _totalPrice: totalPrice } = storeToRefs(receiptStore)
 
 const debtData = ref<number[]>(new Array(12).fill(0))
 const receivableData = ref<number[]>(new Array(12).fill(0))
@@ -67,18 +65,13 @@ for (let i = 0; i < 10; i++) {
 
 const getDataAndInitChart = async () => {
   await receiptStore
-    .getDebtTotalPrice(selectedYear.value)
-    .then(() => console.log(totalDebtPrice.value))
+    .getReceiptTotalPrices(selectedYear.value)
+    .then(() => console.log(totalPrice.value))
     .then(() => {
-      totalDebtPrice.value.forEach((data: any) => {
+      totalPrice.value.debtTotalPrice.forEach((data: any) => {
         debtData.value[data.month - 1] = data.total_borc
       })
-    })
-  await receiptStore
-    .getReceivableTotalPrice(selectedYear.value)
-    .then(() => console.log(totalReceivablePrice.value))
-    .then(() => {
-      totalReceivablePrice.value.forEach((data: any) => {
+      totalPrice.value.receivableTotalPrice.forEach((data: any) => {
         receivableData.value[data.month - 1] = data.total_alacak
       })
     })
@@ -144,7 +137,6 @@ onMounted(async () => {
 
 window.addEventListener('resize', function () {
   ctx.style.width = window.innerWidth
-
   ctx.style.height = window.innerHeight
 })
 </script>

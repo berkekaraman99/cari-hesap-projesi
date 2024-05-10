@@ -216,8 +216,7 @@ const customerStore = useCustomerStore()
 const {
   _customer: customer,
   _receiptCount: receiptCount,
-  _totalDebtPrice: totalDebtPrice,
-  _totalReceivablePrice: totalReceivablePrice
+  _totalPrice: totalPrice
 } = storeToRefs(customerStore)
 const getCustomer = async () => {
   await customerStore.getCustomerById(props.id).then(() => {
@@ -249,18 +248,14 @@ for (let i = 0; i < 10; i++) {
 
 const getDataAndInitChart = async () => {
   await customerStore
-    .getDebtTotalPrice(selectedYear.value, props.id)
-    .then(() => console.log(totalDebtPrice.value))
+    .getTotalPrices(selectedYear.value, props.id)
+    .then(() => console.log(totalPrice.value))
     .then(() => {
-      totalDebtPrice.value.forEach((data: any) => {
+      totalPrice.value.debtTotalPrice.forEach((data: any) => {
         debtData.value[data.month - 1] = data.total_borc
       })
-    })
-  await customerStore
-    .getReceivableTotalPrice(selectedYear.value, props.id)
-    .then(() => console.log(totalReceivablePrice.value))
-    .then(() => {
-      totalReceivablePrice.value.forEach((data: any) => {
+
+      totalPrice.value.receivableTotalPrice.forEach((data: any) => {
         receivableData.value[data.month - 1] = data.total_alacak
       })
     })

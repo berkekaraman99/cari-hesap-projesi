@@ -7,4 +7,5 @@ interface ICustomer {
   tax_administration_city: string
   customer_type: string
   address: string
+  email: string
 }

@@ -7,20 +7,20 @@ export const useReceiptStore = defineStore('receiptStore', {
     receipts: [] as Array<any>,
     statusCode: 0 as number,
     receiptCount: 0 as any,
-    totalDebtPrice: [] as any,
-    totalReceivablePrice: [] as any,
+    totalPrice: {} as any,
     qrCode: null as any,
-    receiptReport: [] as Array<any>
+    receiptReport: [] as Array<any>,
+    customerReport: null as any
   }),
   getters: {
     _receipt: (state: any) => state.receipt as any,
     _receipts: (state: any) => state.receipts as Array<any>,
     _statusCode: (state: any) => state.statusCode as number,
     _receiptCount: (state: any) => state.receiptCount as any,
-    _totalDebtPrice: (state: any) => state.totalDebtPrice as any,
-    _totalReceivablePrice: (state: any) => state.totalReceivablePrice as any,
+    _totalPrice: (state: any) => state.totalPrice as any,
     _qrCode: (state: any) => state.qrCode as any,
-    _receiptReport: (state: any) => state.receiptReport as any
+    _receiptReport: (state: any) => state.receiptReport as any,
+    _customerReport: (state: any) => state.customerReport as any
   },
   actions: {
     async createReceipt(receiptModel: any) {
@@ -73,21 +73,11 @@ export const useReceiptStore = defineStore('receiptStore', {
       }
     },
 
-    async getDebtTotalPrice(year: number) {
+    async getReceiptTotalPrices(year: number) {
       try {
-        const response = await instance.get(`/receipts/get-debt-total-price?year=${year}`)
+        const response = await instance.get(`/receipts/get-receipt-total-prices?year=${year}`)
         console.log(response.data)
-        this.totalDebtPrice = response.data.data
-      } catch (error: any) {
-        console.error(error.response)
-      }
-    },
-
-    async getReceivableTotalPrice(year: number) {
-      try {
-        const response = await instance.get(`/receipts/get-receivable-total-price?year=${year}`)
-        console.log(response.data)
-        this.totalReceivablePrice = response.data.data
+        this.totalPrice = response.data.data
       } catch (error: any) {
         console.error(error.response)
       }
@@ -125,6 +115,22 @@ export const useReceiptStore = defineStore('receiptStore', {
         )
         console.log(response.data)
         this.receiptReport = response.data.data
+      } catch (error: any) {
+        console.error(error.response)
+      }
+    },
+    async getCustomerCompare(sort: {
+      startDate: string
+      endDate: string
+      customer_one: string
+      customer_two: string
+    }) {
+      try {
+        const response = await instance.get(
+          `/receipts/get-customer-compare-report?startDate=${sort.startDate}&endDate=${sort.endDate}&customerOne=${sort.customer_one}&customerTwo=${sort.customer_two}`
+        )
+        console.log(response.data)
+        this.customerReport = response.data.data
       } catch (error: any) {
         console.error(error.response)
       }

@@ -6,11 +6,7 @@ import { onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 
 const receiptStore = useReceiptStore()
-const {
-  _receiptCount: receiptCount,
-  _totalDebtPrice: totalDebtPrice,
-  _totalReceivablePrice: totalReceivablePrice
-} = storeToRefs(receiptStore)
+const { _receiptCount: receiptCount, _totalPrice: totalPrice } = storeToRefs(receiptStore)
 
 const router = useRouter()
 

@@ -33,7 +33,7 @@ export const fetchReceipts = async (req, res, next) => {
   try {
     const { userId } = req.query;
     const [receipts] = await db.query({
-      sql: "SELECT * FROM receipts LEFT JOIN customers ON receipts.customer_id = customers.customer_id WHERE user_id = ? && receipts.is_deleted = ?",
+      sql: "SELECT * FROM receipts LEFT JOIN customers ON receipts.customer_id = customers.customer_id WHERE customers.user_id = ? && receipts.is_deleted = ?",
       values: [userId, 0],
     });
     return res.status(200).json(BaseResponse.success(receipts, 200));
@@ -97,16 +97,16 @@ export const getReceiptCount = async (req, res, next) => {
   }
 };
 
-export const getReceivableReceiptTotalPrice = async (req, res, next) => {
+export const getReceiptTotalPrices = async (req, res, next) => {
   try {
     const { year } = req.query;
-    const [totalPrice] = await db.query({
+    const [receivableTotalPrice] = await db.query({
       sql: `SELECT
               EXTRACT(MONTH FROM created_date) AS month,
               EXTRACT(YEAR FROM created_date) AS year,
               SUM(price) AS total_alacak
             FROM
-              caritestdb.receipts
+              receipts
             WHERE
               receipt_type = ? && EXTRACT(YEAR FROM created_date) = ? && is_deleted = ?
             GROUP BY
@@ -117,22 +117,14 @@ export const getReceivableReceiptTotalPrice = async (req, res, next) => {
                 EXTRACT(MONTH FROM created_date)`,
       values: [1, year, 0],
     });
-    return res.status(200).json(BaseResponse.success(totalPrice, 200));
-  } catch (e) {
-    return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
-  }
-};
 
-export const getDebtReceiptTotalPrice = async (req, res, next) => {
-  try {
-    const { year } = req.query;
-    const [totalPrice] = await db.query({
+    const [debtTotalPrice] = await db.query({
       sql: `SELECT
               EXTRACT(MONTH FROM created_date) AS month,
               EXTRACT(YEAR FROM created_date) AS year,
               SUM(price) AS total_borc
             FROM
-              caritestdb.receipts
+              receipts
             WHERE
               receipt_type = ? && EXTRACT(YEAR FROM created_date) = ? && is_deleted = ?
             GROUP BY
@@ -143,7 +135,8 @@ export const getDebtReceiptTotalPrice = async (req, res, next) => {
                 EXTRACT(MONTH FROM created_date)`,
       values: [2, year, 0],
     });
-    return res.status(200).json(BaseResponse.success(totalPrice, 200));
+
+    return res.status(200).json(BaseResponse.success({ receivableTotalPrice, debtTotalPrice }, 200));
   } catch (e) {
     return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
   }
@@ -180,7 +173,6 @@ export const downloadReceiptPdf = async (req, res, next) => {
     const url = "https://pdf-lib.js.org/assets/ubuntu/Ubuntu-R.ttf";
     const fontBytes = await fetch(url).then((res) => res.arrayBuffer());
 
-    // Create a new PDFDocument
     const pdfDoc = await PDFDocument.create();
 
     const headerFont = await pdfDoc.embedFont(StandardFonts.CourierBold);
@@ -189,10 +181,8 @@ export const downloadReceiptPdf = async (req, res, next) => {
     const ubuntuFont = await pdfDoc.embedFont(fontBytes, { subset: true });
     // const ubuntuFont = fontBytes;
 
-    // Add a blank page to the document
     const page = pdfDoc.addPage([595, 842]);
 
-    // Get the form so we can add fields to it
     const form = pdfDoc.getForm();
 
     page.drawText("E-Dekont", { x: 250, y: 800, size: 20, font: headerFont });
@@ -231,10 +221,6 @@ export const downloadReceiptPdf = async (req, res, next) => {
     page.drawText("Ödeme Yöntemi: ", { x: 40, y: 552, size: 12, font: ubuntuFont });
     page.drawText(receipt.payment_method, { x: 140, y: 552, size: 12, font: ubuntuFont });
 
-    // page.drawRectangle({ x: 40, y: 450, width: 515, height: 90, borderWidth: 1, borderColor: grayscale(0.5), borderOpacity: 0.75 });
-
-    // page.drawText("Açiklama...", { x: 50, y: 515, size: 12 });
-
     const description = form.createTextField("description");
     description.setText(receipt.description);
     description.updateAppearances(ubuntuFont, () => {
@@ -244,25 +230,6 @@ export const downloadReceiptPdf = async (req, res, next) => {
 
     page.drawText("Yekün:", { x: 475, y: 410, size: 12, font: ubuntuFont });
     page.drawText(receipt.price.toString() + " TL", { x: 515, y: 410, size: 12, font: ubuntuFont });
-
-    // // Add the planet dropdown and description
-    // page.drawText("Select your favorite planet*:", { x: 50, y: 280, size: 20 });
-
-    // const planetsField = form.createDropdown("favorite.planet");
-    // planetsField.addOptions(["Venus", "Earth", "Mars", "Pluto"]);
-    // planetsField.select("Pluto");
-    // planetsField.addToPage(page, { x: 55, y: 220 });
-
-    // // Add the person option list and description
-    // page.drawText("Select your favorite person:", { x: 50, y: 180, size: 18 });
-
-    // const personField = form.createOptionList("favorite.person");
-    // personField.addOptions(["Julius Caesar", "Ada Lovelace", "Cleopatra", "Aaron Burr", "Mark Antony"]);
-    // personField.select("Ada Lovelace");
-    // personField.addToPage(page, { x: 55, y: 70 });
-
-    // // Just saying...
-    // page.drawText(`* Pluto should be a planet too!`, { x: 15, y: 15, size: 15 });
 
     const pdfBytes = await pdfDoc.save();
     const pdfBuffer = Buffer.from(pdfBytes);
@@ -278,14 +245,33 @@ export const downloadReceiptPdf = async (req, res, next) => {
 export const getReceiptReport = async (req, res, next) => {
   try {
     const { sortBy, sort, startDate, endDate } = req.query;
+    console.log(sortBy, sort);
     const [report] = await db.query({
       sql: `SELECT c.customer_name as customer, SUM(CASE WHEN r.receipt_type = 1 THEN price ELSE 0 END) AS alacak, SUM(CASE WHEN r.receipt_type = 2 THEN price ELSE 0 END) AS borc,
       SUM(CASE WHEN r.receipt_type = 1 THEN price ELSE 0 END) - SUM(CASE WHEN r.receipt_type = 2 THEN price ELSE 0 END) as net 
-      FROM caritestdb.receipts r INNER JOIN caritestdb.customers c ON c.customer_id = r.customer_id 
-      where r.is_deleted = 0 AND c.is_deleted = 0 AND r.created_date BETWEEN ? AND ? group by c.customer_name order by ? ?;`,
-      values: [startDate, endDate, sortBy, sort],
+      FROM receipts r INNER JOIN customers c ON c.customer_id = r.customer_id 
+      where r.is_deleted = 0 AND c.is_deleted = 0 AND r.created_date BETWEEN ? AND ? group by c.customer_name ORDER BY ? ${sort}`,
+      values: [startDate, endDate, sortBy],
     });
     return res.status(200).json(BaseResponse.success(report, 200));
+  } catch (e) {
+    return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
+  }
+};
+
+export const getCustomerComparison = async (req, res, _) => {
+  try {
+    const { customerOne, customerTwo, startDate, endDate } = req.query;
+    const [report] = await db.query({
+      sql: `SELECT c.customer_name, SUM(CASE WHEN r.receipt_type = 1 THEN r.price ELSE 0 END) AS alacak,  
+      SUM(CASE WHEN r.receipt_type = 2 THEN r.price ELSE 0 END) AS borc FROM customers c LEFT JOIN receipts r ON c.customer_id = r.customer_id WHERE c.customer_name IN (?, ?) AND r.created_date BETWEEN ? and ? GROUP BY c.customer_name;`,
+      values: [customerOne, customerTwo, startDate, endDate],
+    });
+    const [report2] = await db.query({
+      sql: `SELECT c.customer_name, sum(r.price) FROM customers c LEFT JOIN receipts r on c.customer_id = r.customer_id WHERE c.customer_name IN (?, ?) AND r.created_date BETWEEN ? AND ? GROUP BY c.customer_name`,
+      values: [customerOne, customerTwo, startDate, endDate],
+    });
+    return res.status(200).json(BaseResponse.success({ report, report2 }, 200));
   } catch (e) {
     return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
   }
