@@ -1,10 +1,10 @@
 import mysql from "mysql2";
 
 const connection = mysql.createConnection({
-  host: "localhost",
-  port: "3306",
-  user: "root",
-  database: "sys",
+  host: process.env.HOST ?? "localhost",
+  port: process.env.DB_PORT ?? "3306",
+  user: process.env.USER ?? "root",
+  database: process.env.SYS_DATABASE ?? "sys",
   password: process.env.DATABASE ?? "Skodal9901*",
 });
 
@@ -29,9 +29,9 @@ connection.connect((err) => {
 });
 
 const createTableConnection = mysql.createConnection({
-  host: "localhost",
-  port: "3306",
-  user: "root",
+  host: process.env.HOST ?? "localhost",
+  port: process.env.DB_PORT ?? "3306",
+  user: process.env.ROOT ?? "root",
   database: process.env.DATABASE ?? "caritakipdb",
   password: process.env.PASSWORD ?? "Skodal9901*",
 });
@@ -127,9 +127,9 @@ createTableConnection.connect((err) => {
 
 export const db = mysql
   .createPool({
-    host: "localhost",
-    port: "3306",
-    user: "root",
+    host: process.env.HOST ?? "localhost",
+    port: process.env.DB_PORT ?? "3306",
+    user: process.env.ROOT ?? "root",
     database: process.env.DATABASE ?? "caritakipdb",
     password: process.env.DATABASE ?? "Skodal9901*",
     waitForConnections: true,

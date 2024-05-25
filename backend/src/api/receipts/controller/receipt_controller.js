@@ -4,6 +4,7 @@ import { createReceiptValidator } from "../validators/create_receipt_validator.j
 import qr from "qrcode";
 import { PDFDocument, StandardFonts, drawTextField, grayscale, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
+import { getLocalIP } from "../../../features/utils/ip_helper.js";
 
 export const createReceipt = async (req, res, next) => {
   try {
@@ -146,14 +147,21 @@ export const createQrCode = async (req, res, next) => {
   try {
     const { id } = req.query;
     // const { receiptId } = req.query;
-    const qrContent = "http://192.168.224.249:3000/api/receipts/download-receipt?id=" + id;
-    qr.toDataURL(qrContent, (err, url) => {
-      if (err) {
-        res.status(500).send("QR kodu oluşturulurken bir hata oluştu.");
-        return;
-      }
-      res.send(url);
-    });
+    let qrContent;
+
+    getLocalIP()
+      .then((ip) => {
+        qrContent = `http://${ip}:3000/api/receipts/download-receipt?id=${id}`;
+      })
+      .then(() => {
+        qr.toDataURL(qrContent, (err, url) => {
+          if (err) {
+            res.status(500).send("QR kodu oluşturulurken bir hata oluştu.");
+            return;
+          }
+          res.send(url);
+        });
+      });
   } catch (error) {
     return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
   }
@@ -253,7 +261,26 @@ export const getReceiptReport = async (req, res, next) => {
       where r.is_deleted = 0 AND c.is_deleted = 0 AND r.created_date BETWEEN ? AND ? group by c.customer_name ORDER BY ? ${sort}`,
       values: [startDate, endDate, sortBy],
     });
-    return res.status(200).json(BaseResponse.success(report, 200));
+
+    const [donemRapor] = await db.query({
+      sql: `
+      SELECT SUM(CASE WHEN receipt_type = 1 THEN price ELSE 0 END) AS TOPLAM_ALACAK,
+		    SUM(CASE WHEN receipt_type = 2 THEN price ELSE 0 END) AS TOPLAM_BORC FROM receipts 
+        WHERE is_deleted = 0 AND created_date BETWEEN ? AND ?;
+      `,
+      values: [startDate, endDate],
+    });
+
+    const [receiptCount] = await db.query({
+      sql: `
+      SELECT c.customer_name, SUM(CASE WHEN r.is_deleted = 0 THEN 1 ELSE 0 END) AS receipt_count 
+      FROM receipts r INNER JOIN customers c ON c.customer_id = r.customer_id 
+      WHERE r.is_deleted = 0 AND r.created_date BETWEEN ? AND ?
+      GROUP BY c.customer_name ORDER BY receipt_count DESC;
+      `,
+      values: [startDate, endDate],
+    });
+    return res.status(200).json(BaseResponse.success({ report, donemRapor, receiptCount }, 200));
   } catch (e) {
     return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
   }

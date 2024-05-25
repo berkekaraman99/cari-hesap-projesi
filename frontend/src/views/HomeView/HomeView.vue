@@ -26,9 +26,9 @@ const goToCustomers = () => {
     </div>
     <div class="card px-4 py-3 bg-body-secondary">
       <div class="row row-cols-1 row-cols-md-2 my-2">
-        <div class="col-12 col-sm-12 col-md-4">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
           <div class="row">
-            <div class="col-12 mb-3">
+            <div class="col-12 col-sm-4 col-md-4 col-lg-12 mb-3">
               <div class="card card-body">
                 <div class="row">
                   <div class="col-12 col-lg-6">
@@ -49,8 +49,8 @@ const goToCustomers = () => {
                 </button>
               </div>
             </div>
-            <div class="col-12 mb-3">
-              <div class="card card-body">
+            <div class="col-12 col-sm-4 col-md-4 col-lg-12 mb-3">
+              <div class="card card-body h-100 d-flex align-items-center justify-content-center">
                 <div class="row">
                   <div class="col-12 col-lg-6">
                     <h4 class="text-center">
@@ -67,8 +67,8 @@ const goToCustomers = () => {
                 </div>
               </div>
             </div>
-            <div class="col-12 mb-3">
-              <div class="card card-body">
+            <div class="col-12 col-sm-4 col-md-4 col-lg-12 mb-3">
+              <div class="card card-body h-100 d-flex align-items-center justify-content-center">
                 <div class="row">
                   <div class="col-12 col-lg-6">
                     <h4 class="text-center">
@@ -85,7 +85,7 @@ const goToCustomers = () => {
           </div>
         </div>
         <TheChart />
-        <div class="col-12 col-md-8"></div>
+        <!-- <div class="col-12 col-md-8"></div> -->
       </div>
     </div>
   </main>

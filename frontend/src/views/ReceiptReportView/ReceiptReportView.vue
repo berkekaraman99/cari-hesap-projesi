@@ -122,15 +122,15 @@
         />
       </form>
     </div>
-    <Transition name="fade">
+    <TransitionGroup name="fade">
       <div class="card card-body my-4" v-if="report.length > 0">
         <table class="table table-bordered table-hover shadow-sm">
           <thead>
             <tr>
               <th class="col">Müşteri Adı</th>
-              <th class="col">Alacak</th>
-              <th class="col">Borç</th>
-              <th class="col">Net</th>
+              <th class="col">Toplam Alacak</th>
+              <th class="col">Toplam Borç</th>
+              <th class="col">Net Alacak-Borç</th>
             </tr>
           </thead>
           <tbody>
@@ -142,19 +142,55 @@
             </tr>
           </tbody>
         </table>
+
+        <table class="table table-bordered table-hover shadow-sm mt-4">
+          <thead>
+            <tr>
+              <th class="col">Toplam Alacak</th>
+              <th class="col">Toplam Borç</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ donemRaporu[0].TOPLAM_ALACAK + ' ₺' }}</td>
+              <td>{{ donemRaporu[0].TOPLAM_BORC + ' ₺' }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="table table-bordered table-hover shadow-sm mt-4">
+          <thead>
+            <tr>
+              <th class="col">Müşteri</th>
+              <th class="col">Dekont Sayısı</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="count in receiptCount" v-bind:key="count">
+              <td>{{ count.customer_name }}</td>
+              <td>{{ count.receipt_count }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </Transition>
+    </TransitionGroup>
     <div v-show="cReport != null">
       <div class="card p-4 my-3">
         <h3 class="border-bottom d-inline">Alacak - Borç Karşılaştırması</h3>
-        <div class="d-flex align-items-center justify-content-around">
-          <div><canvas id="myChart1" class="chartjs-render-monitor"></canvas></div>
-          <div><canvas id="myChart2" class="chartjs-render-monitor"></canvas></div>
+        <div class="">
+          <div class="row">
+            <div class="col-12">
+              <canvas id="myChart3" class="chartjs-render-monitor"></canvas>
+            </div>
+            <div class="col-12 col-sm-6">
+              <canvas id="myChart1" class="chartjs-render-monitor"></canvas>
+            </div>
+            <div class="col-12 col-sm-6">
+              <canvas id="myChart2" class="chartjs-render-monitor"></canvas>
+            </div>
+          </div>
         </div>
       </div>
-      <!-- <div class="card p-4 my-3">
-        <h3 class="border-bottom d-inline">Borç Karşılaştırması</h3>
-      </div> -->
     </div>
   </div>
 </template>
@@ -170,12 +206,15 @@ import { Months } from '@/constants/months'
 const reportType = ref('all-reports')
 let ctx1: any
 let ctx2: any
+let ctx3: any
 let doughnutChartAlacak: any
 let doughnutChartBorc: any
+let graphChart: any
 
 onMounted(async () => {
   ctx1 = document.getElementById('myChart1')
   ctx2 = document.getElementById('myChart2')
+  ctx3 = document.getElementById('myChart3')
 })
 
 window.addEventListener('resize', function () {
@@ -189,7 +228,12 @@ const labels = ref<string[]>([])
 Object.values(Months).forEach((value) => labels.value.push(value))
 
 const receiptStore = useReceiptStore()
-const { _receiptReport: report, _customerReport: cReport } = storeToRefs(receiptStore)
+const {
+  _receiptReport: report,
+  _customerReport: cReport,
+  _receiptDonemReport: donemRaporu,
+  _receiptCountReport: receiptCount
+} = storeToRefs(receiptStore)
 const customerStore = useCustomerStore()
 const { _searchedCustomers: searchCustomers } = storeToRefs(customerStore)
 
@@ -269,12 +313,12 @@ const getReport = async () => {
       })
       .then(({ doughnutDataAlacak, doughnutDataBorc }) => {
         doughnutChartAlacak = new Chart(ctx1, {
-          type: 'doughnut',
+          type: 'pie',
           data: doughnutDataAlacak
         })
 
         doughnutChartBorc = new Chart(ctx2, {
-          type: 'doughnut',
+          type: 'pie',
           data: doughnutDataBorc
         })
       })

@@ -9,6 +9,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   // base: path.resolve(__dirname, './dist'),
   base: './',
+  server: { host: true },
   plugins: [vue()],
   resolve: {
     alias: {

@@ -1,6 +1,6 @@
 <template>
   <div class="col-12 col-sm-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
-    <h1>Müşteri Oluştur</h1>
+    <h1 class="my-4">Müşteri Oluştur</h1>
     <form @submit.prevent="createCustomer">
       <div class="card card-body table-responsive">
         <table class="table table-borderless">
@@ -78,14 +78,6 @@
             </td>
           </tr>
           <tr v-if="customerForm.customerType === 'company'">
-            <th>Adres</th>
-            <td>
-              <div>
-                <FormKit type="text" name="Adres" v-model="customerForm.address" />
-              </div>
-            </td>
-          </tr>
-          <tr v-if="customerForm.customerType === 'company'">
             <th>Vergi No</th>
             <td>
               <div>
@@ -109,6 +101,25 @@
                   v-model="customerForm.taxNumber"
                 />
               </div>
+            </td>
+          </tr>
+          <tr v-if="customerForm.customerType === 'company'">
+            <th>Adres</th>
+            <td>
+              <div>
+                <FormKit type="text" name="Adres" v-model="customerForm.address" />
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th>Email</th>
+            <td>
+              <FormKit
+                type="email"
+                validation="email"
+                placeholder="example@mail.com"
+                v-model="customerForm.email"
+              />
             </td>
           </tr>
         </table>
@@ -138,6 +149,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
+import moment from 'moment'
 
 const toast = useToast()
 
@@ -159,7 +171,8 @@ const customerForm = reactive({
   taxAdministrationCity: '',
   taxNumber: '',
   customerType: 'company',
-  address: ''
+  address: '',
+  email: ''
 })
 
 const resetForm = () => {
@@ -169,6 +182,7 @@ const resetForm = () => {
   customerForm.customerType = ''
   customerForm.taxAdministrationCity = ''
   customerForm.address = ''
+  customerForm.email = ''
 }
 
 const createCustomer = async () => {
@@ -179,7 +193,7 @@ const createCustomer = async () => {
         ...customerForm,
         customerId: customerId,
         userId: user.value.id,
-        createdAt: new Date().toISOString()
+        createdAt: moment().format('YYYY-MM-DD HH:mm:ss')
       })
       .then(() => {
         if (statusCode.value === 201) {

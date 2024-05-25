@@ -1,7 +1,7 @@
 <template>
   <the-loading v-if="isLoading"></the-loading>
   <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3" v-else>
-    <h1>Müşteri Bilgisini Düzenle</h1>
+    <h1 class="my-4">Müşteri Bilgisini Düzenle</h1>
     <form @submit.prevent="update">
       <div class="card card-body table-responsive">
         <table class="table table-borderless">
@@ -112,6 +112,17 @@
               </div>
             </td>
           </tr>
+          <tr>
+            <th>Email</th>
+            <td>
+              <FormKit
+                type="email"
+                validation="email"
+                placeholder="example@mail.com"
+                v-model="customerForm.email"
+              />
+            </td>
+          </tr>
         </table>
         <div class="d-flex align-items-center justify-content-end">
           <FormKit type="submit" label="Kaydet" :disabled="statusCode === 201" />
@@ -166,6 +177,7 @@ const getCustomer = async () => {
     customerForm.taxAdministrationCity = customer.value.tax_administration_city
     customerForm.customerType = customer.value.customer_type
     customerForm.address = customer.value.address
+    customerForm.email = customer.value.email
   })
 }
 
@@ -185,7 +197,8 @@ const customerForm = reactive({
   taxAdministrationCity: '',
   taxNumber: '',
   customerType: '',
-  address: ''
+  address: '',
+  email: ''
 })
 
 const update = async () => {

@@ -31,6 +31,9 @@
             <li class="nav-item">{{ user.company_name }}</li>
           </ul>
         </div>
+        <div class="dark-light" @click="changeTheme">
+          <i class="fa-solid fa-circle-half-stroke fa-lg"></i>
+        </div>
         <div class="dropdown">
           <a class="nav-link user-icon" href="#" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-circle-user fa-xl"></i
@@ -38,9 +41,9 @@
 
           <ul class="dropdown-menu dropdown-menu-end">
             <li class="dropdown-item"><i class="fa-solid fa-city"></i> {{ user.company_name }}</li>
-            <RouterLink :to="{ name: 'settings' }" class="dropdown-item"
+            <!-- <RouterLink :to="{ name: 'settings' }" class="dropdown-item"
               ><i class="fa-solid fa-gear"></i> Ayarlar</RouterLink
-            >
+            > -->
             <li>
               <a class="dropdown-item text-danger fw-bold" href="#" @click="logout()"
                 ><i class="fa-solid fa-arrow-right-from-bracket"></i>Çıkış Yap</a
@@ -57,12 +60,28 @@
 import router from '@/router'
 import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
+
+let body: HTMLElement | null
+
+onMounted(() => {
+  body = document.querySelector('body')
+})
 
 const authStore = useAuthStore()
 
 const { _user: user } = storeToRefs(authStore)
 const logout = () => {
   authStore.logout()
+}
+
+const changeTheme = () => {
+  const val = body?.getAttribute('data-bs-theme')
+  if (val === 'dark') {
+    body?.setAttribute('data-bs-theme', 'light')
+  } else {
+    body?.setAttribute('data-bs-theme', 'dark')
+  }
 }
 </script>
 
@@ -116,5 +135,16 @@ const logout = () => {
 
 nav div.container-fluid {
   height: 3rem;
+}
+
+.dark-light {
+  cursor: pointer;
+  // background-color: whitesmoke;
+  padding: 0.5rem;
+  border-radius: 99px;
+  margin-right: 0.5rem;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.568);
+  }
 }
 </style>

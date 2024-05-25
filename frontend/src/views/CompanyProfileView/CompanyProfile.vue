@@ -9,12 +9,6 @@
               <tr>
                 <td><b>Kullanıcı Adı:</b></td>
                 <td>
-                  <!-- <input
-                    class="form-control"
-                    type="text"
-                    :disabled="!isEditable"
-                    v-model="userModel.userName"
-                  /> -->
                   <FormKit
                     type="text"
                     name="username"
@@ -28,12 +22,6 @@
               <tr>
                 <td><b>Firma Adı:</b></td>
                 <td>
-                  <!-- <input
-                    class="form-control"
-                    type="text"
-                    :disabled="!isEditable"
-                    v-model="userModel.companyName"
-                  /> -->
                   <FormKit
                     type="text"
                     name="companyName"
@@ -46,12 +34,6 @@
               <tr>
                 <td><b>Vergi Dairesi Şehri:</b></td>
                 <td>
-                  <!-- <input
-                    class="form-control"
-                    type="text"
-                    :disabled="!isEditable"
-                    v-model="userModel.taxAdministrationCity"
-                  /> -->
                   <FormKit
                     type="select"
                     name="city"
@@ -68,12 +50,6 @@
               <tr>
                 <td><b>Vergi Dairesi:</b></td>
                 <td>
-                  <!-- <input
-                    class="form-control"
-                    type="text"
-                    :disabled="!isEditable"
-                    v-model="userModel.taxAdministration"
-                  /> -->
                   <FormKit
                     type="select"
                     name="tax-administration"
@@ -92,12 +68,6 @@
               <tr>
                 <td><b>Vergi No/TC No:</b></td>
                 <td>
-                  <!-- <input
-                    class="form-control"
-                    type="text"
-                    :disabled="!isEditable"
-                    v-model="userModel.taxNumber"
-                  /> -->
                   <FormKit
                     type="text"
                     name="vergino"
@@ -110,16 +80,22 @@
               <tr>
                 <td><b>Adres:</b></td>
                 <td>
-                  <!-- <input
-                    class="form-control"
-                    type="text"
-                    :disabled="!isEditable"
-                    v-model="userModel.taxNumber"
-                  /> -->
                   <FormKit
                     type="text"
                     name="address"
                     v-model="userModel.address"
+                    :disabled="!isEditable"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td><b>Email:</b></td>
+                <td>
+                  <FormKit
+                    type="email"
+                    validation="email"
+                    placeholder="example@mail.com"
+                    v-model="userModel.email"
                     :disabled="!isEditable"
                   />
                 </td>
@@ -191,7 +167,8 @@ const userModel = reactive({
   taxNumber: user.value.tax_number,
   taxAdministration: user.value.tax_administration,
   taxAdministrationCity: user.value.tax_administration_city,
-  address: user.value.address
+  address: user.value.address,
+  email: user.value.email
 })
 
 const updateInfo = async () => {

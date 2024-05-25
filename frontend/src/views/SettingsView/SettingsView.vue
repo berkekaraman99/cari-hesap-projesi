@@ -18,8 +18,6 @@
                 value: 'dark'
               }
             ]"
-            v-model="deviceTheme"
-            @change="changeTheme()"
           />
         </div>
       </div>
@@ -30,23 +28,23 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 
-const deviceTheme = ref('dark')
-let body: any
+// const deviceTheme = ref('dark')
+// let body: any
 
-onMounted(() => {
-  body = document.querySelector('body')
-  deviceTheme.value = localStorage.getItem('userTheme') ?? 'dark'
-})
+// onMounted(() => {
+//   body = document.querySelector('body')
+//   deviceTheme.value = localStorage.getItem('userTheme') ?? 'dark'
+// })
 
-watch(deviceTheme, () => changeTheme)
+// watch(deviceTheme, () => changeTheme)
 
-const changeTheme = () => {
-  deviceTheme.value === 'dark'
-    ? body?.setAttribute('data-bs-theme', 'dark')
-    : body?.setAttribute('data-bs-theme', 'light')
+// const changeTheme = () => {
+//   deviceTheme.value === 'dark'
+//     ? body?.setAttribute('data-bs-theme', 'dark')
+//     : body?.setAttribute('data-bs-theme', 'light')
 
-  localStorage.setItem('userTheme', deviceTheme.value)
-}
+//   localStorage.setItem('userTheme', deviceTheme.value)
+// }
 </script>
 
 <style scoped></style>

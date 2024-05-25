@@ -10,6 +10,8 @@ export const useReceiptStore = defineStore('receiptStore', {
     totalPrice: {} as any,
     qrCode: null as any,
     receiptReport: [] as Array<any>,
+    receiptDonemReport: [] as Array<any>,
+    receiptCountReport: [] as Array<any>,
     customerReport: null as any
   }),
   getters: {
@@ -20,6 +22,8 @@ export const useReceiptStore = defineStore('receiptStore', {
     _totalPrice: (state: any) => state.totalPrice as any,
     _qrCode: (state: any) => state.qrCode as any,
     _receiptReport: (state: any) => state.receiptReport as any,
+    _receiptDonemReport: (state: any) => state.receiptDonemReport as any,
+    _receiptCountReport: (state: any) => state.receiptCountReport as any,
     _customerReport: (state: any) => state.customerReport as any
   },
   actions: {
@@ -114,7 +118,9 @@ export const useReceiptStore = defineStore('receiptStore', {
           `/receipts/get-receipt-report?sortBy=${sort.sortBy}&sort=${sort.sort}&startDate=${sort.startDate}&endDate=${sort.endDate}`
         )
         console.log(response.data)
-        this.receiptReport = response.data.data
+        this.receiptReport = response.data.data.report
+        this.receiptDonemReport = response.data.data.donemRapor
+        this.receiptCountReport = response.data.data.receiptCount
       } catch (error: any) {
         console.error(error.response)
       }

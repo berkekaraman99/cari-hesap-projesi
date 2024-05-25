@@ -1,11 +1,11 @@
 <template>
-  <div class="col-12 col-md-8">
+  <div class="col-12 col-sm-12 col-md-12 col-lg-8">
     <div class="card shadow-sm">
       <div class="card-header">
         <div class="row">
           <div class="d-flex align-items-center justify-content-between">
             <div>
-              <h4 class="card-title my-2">Grafik</h4>
+              <h4 class="card-title my-2">Aylık Fatura Fiyatları</h4>
             </div>
             <div>
               <select

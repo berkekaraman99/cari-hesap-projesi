@@ -219,7 +219,7 @@ onBeforeMount(async () => {
 })
 
 const sortTable = (n: number) => {
-  let table: HTMLElement,
+  let table: HTMLTableElement,
     rows,
     switching,
     i,
@@ -228,7 +228,7 @@ const sortTable = (n: number) => {
     shouldSwitch,
     dir,
     switchcount = 0
-  table = document.getElementById('receiptsTable')!
+  table = document.getElementById('receiptsTable') as HTMLTableElement
   switching = true
   // Set the sorting direction to ascending:
   dir = 'asc'
@@ -266,7 +266,7 @@ const sortTable = (n: number) => {
     if (shouldSwitch) {
       /* If a switch has been marked, make the switch
       and mark that a switch has been done: */
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i])
+      rows[i].parentNode!.insertBefore(rows[i + 1], rows[i])
       switching = true
       // Each time a switch is done, increase this count by 1:
       switchcount++

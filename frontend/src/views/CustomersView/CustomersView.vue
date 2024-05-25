@@ -11,18 +11,20 @@
           <thead>
             <tr>
               <th class="col" @click="sortTable(0)">Müşteri/Firma Adı</th>
-              <th class="col" @click="sortTable(1)">
+              <th class="col" @click="sortTable(1)">Müşteri Tipi</th>
+              <th class="col" @click="sortTable(2)">
                 <div>Vergi Numarası</div>
                 <div>TCNO</div>
               </th>
-              <th class="col" @click="sortTable(2)">Vergi Dairesi</th>
-              <th class="col" @click="sortTable(3)">Vergi Dairesi Şehri</th>
-              <th class="col" @click="sortTable(4)">İşlemler</th>
+              <th class="col" @click="sortTable(3)">Vergi Dairesi</th>
+              <th class="col" @click="sortTable(4)">Vergi Dairesi Şehri</th>
+              <th class="col" @click="sortTable(5)">İşlemler</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="customer in customers" v-bind:key="customer.customer_id">
               <td>{{ customer.customer_name }}</td>
+              <td>{{ customerType(customer.customer_type) }}</td>
               <td>{{ customer.tax_number }}</td>
               <td>{{ customer.tax_administration_city }}</td>
               <td>{{ customer.tax_administration }}</td>
@@ -149,6 +151,10 @@ const deleteCustomer = async () => {
     .finally(() => (isDeleting.value = false))
 }
 
+const customerType = (customerType: string) => {
+  return customerType === 'company' ? 'Şirket' : 'Şahıs'
+}
+
 onMounted(() => getCustomers())
 
 const dropdownItems = [
@@ -165,7 +171,7 @@ const dropdownItems = [
 ]
 
 const sortTable = (n: number) => {
-  let table: HTMLElement,
+  let table: HTMLTableElement,
     rows,
     switching,
     i,
@@ -174,7 +180,7 @@ const sortTable = (n: number) => {
     shouldSwitch,
     dir,
     switchcount = 0
-  table = document.getElementById('customersTable')!
+  table = document.getElementById('customersTable') as HTMLTableElement
   switching = true
   // Set the sorting direction to ascending:
   dir = 'asc'
@@ -212,7 +218,7 @@ const sortTable = (n: number) => {
     if (shouldSwitch) {
       /* If a switch has been marked, make the switch
       and mark that a switch has been done: */
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i])
+      rows[i].parentNode!.insertBefore(rows[i + 1], rows[i])
       switching = true
       // Each time a switch is done, increase this count by 1:
       switchcount++

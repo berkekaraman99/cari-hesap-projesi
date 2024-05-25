@@ -3,9 +3,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import RootRoutes from "./api/_routes/index.js";
+import { getLocalIP } from "./features/utils/ip_helper.js";
 dotenv.config();
 
 const app = express();
+const pbIp = getLocalIP();
 
 app.use(cors());
 app.use(express.json());
@@ -21,6 +23,8 @@ app.use((req, res, next) => {
 
 app.use("/api", RootRoutes);
 
-app.listen(process.env.PORT ?? 3000, () => {
-  console.log("Sunucu çalışıyor");
+getLocalIP().then((ip) => {
+  app.listen(3000, ip, () => {
+    console.log("Sunucu şu adreste çalışıyor", ip + ":" + 3000);
+  });
 });
