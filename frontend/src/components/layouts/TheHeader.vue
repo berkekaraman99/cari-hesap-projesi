@@ -31,9 +31,9 @@
             <li class="nav-item">{{ user.company_name }}</li>
           </ul>
         </div>
-        <div class="dark-light" @click="changeTheme">
+        <!-- <div class="dark-light" @click="changeTheme">
           <i class="fa-solid fa-circle-half-stroke fa-lg"></i>
-        </div>
+        </div> -->
         <div class="dropdown">
           <a class="nav-link user-icon" href="#" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-circle-user fa-xl"></i

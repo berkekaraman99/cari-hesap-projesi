@@ -1,6 +1,6 @@
 <template>
   <div class="col-12 col-sm-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
-    <h1 class="my-4">Dekont Oluştur</h1>
+    <h1 class="my-4">Dekontu Düzenle</h1>
     <form @submit.prevent="updateReceipt()">
       <div class="card card-body table-responsive">
         <table class="table table-borderless table-hover">
@@ -120,6 +120,7 @@
 
 <script setup lang="ts">
 import router from '@/router'
+import { useAuthStore } from '@/stores/auth'
 import { useCustomerStore } from '@/stores/customer'
 import { useReceiptStore } from '@/stores/receipt'
 import { storeToRefs } from 'pinia'
@@ -139,6 +140,8 @@ const receiptStore = useReceiptStore()
 const { _statusCode: statusCode, _receipt: receipt } = storeToRefs(receiptStore)
 const customerStore = useCustomerStore()
 const { _searchedCustomers: searchedCustomers } = storeToRefs(customerStore)
+const authStore = useAuthStore()
+const { _user: user } = storeToRefs(authStore)
 
 const latestDate = new Date()
 latestDate.setDate(latestDate.getDate() + 1)
@@ -153,7 +156,7 @@ const searchCustomer = async () => {
   clearTimeout(timer)
 
   timer = setTimeout(async () => {
-    await customerStore.searchCustomers(customerName.value)
+    await customerStore.searchCustomers(customerName.value, user.value.id)
   }, 750)
 }
 

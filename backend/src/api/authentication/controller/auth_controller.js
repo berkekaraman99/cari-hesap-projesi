@@ -21,17 +21,17 @@ export const login = async (req, res, next) => {
     const [row] = await db.query({ sql: "SELECT * FROM users WHERE user_name = ?", values: [userName] });
     console.log(row[0]);
     if (row.length === 0) {
-      throw new UnauthorizedException("Invalid email or password");
+      return res.status(200).json(BaseResponse.success("Kullanıcı adı veya şifre yanlış", 1001));
     }
     if (!(await comparePassword(password, row[0].hashed_password))) {
-      throw new UnauthorizedException("Invalid email or password");
+      return res.status(200).json(BaseResponse.success("Kullanıcı adı veya şifre yanlış", 1001));
     }
 
     const token = generateToken({
       id: row[0].id,
     });
 
-    return res.status(200).json(BaseResponse.success(token));
+    return res.status(200).json(BaseResponse.success(token, 200));
   } catch (e) {
     return res.status(500).json(BaseResponse.fail(e.message, e.statusCode));
   }
@@ -99,7 +99,7 @@ export const getUserAfterLogin = async (req, res, next) => {
   try {
     const decodedToken = decodeToken(token);
     const [row] = await db.query({
-      sql: "SELECT id, company_name, user_name, tax_number, tax_administration, tax_administration_city, address FROM users WHERE id = ?",
+      sql: "SELECT id, company_name, user_name, tax_number, tax_administration, tax_administration_city, address, email FROM users WHERE id = ?",
       values: [decodedToken.id],
     });
 
@@ -112,11 +112,11 @@ export const getUserAfterLogin = async (req, res, next) => {
 
 export const updateUserInfos = async (req, res, next) => {
   try {
-    const { id, companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, address } = req.body;
+    const { id, companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, address, email } = req.body;
 
     await db.query({
-      sql: "UPDATE users SET company_name = ?, user_name = ?, tax_number = ?, tax_administration = ?, tax_administration_city = ?, address = ? WHERE id = ?",
-      values: [companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, address, id],
+      sql: "UPDATE users SET company_name = ?, user_name = ?, tax_number = ?, tax_administration = ?, tax_administration_city = ?, address = ?, email = ? WHERE id = ?",
+      values: [companyName, userName, taxNumber, taxAdministration, taxAdministrationCity, address, email, id],
     });
 
     return res.status(200).json(BaseResponse.success("Kullanıcı bilgileri başarıyla güncellendi", 200));

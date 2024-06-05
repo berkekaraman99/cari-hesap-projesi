@@ -59,11 +59,11 @@ export const deleteCustomer = async (req, res, next) => {
 
 export const updateCustomer = async (req, res, next) => {
   try {
-    const { customerId, customerName, taxAdministration, taxAdministrationCity, taxNumber, address } = req.body;
+    const { customerId, customerName, taxAdministration, taxAdministrationCity, taxNumber, address, email } = req.body;
 
     await db.query({
-      sql: "UPDATE customers SET customer_name = ?, tax_number = ?, tax_administration = ?, tax_administration_city = ?, address = ? WHERE customer_id = ?",
-      values: [customerName, taxNumber, taxAdministration, taxAdministrationCity, address, customerId],
+      sql: "UPDATE customers SET customer_name = ?, tax_number = ?, tax_administration = ?, tax_administration_city = ?, address = ?, email = ? WHERE customer_id = ?",
+      values: [customerName, taxNumber, taxAdministration, taxAdministrationCity, address, email, customerId],
     });
 
     res.status(201).json(BaseResponse.success("Customer updated successfully!", 201));
@@ -88,10 +88,10 @@ export const getCustomerById = async (req, res, next) => {
 
 export const getCustomers = async (req, res, next) => {
   try {
-    const query = "SELECT * FROM customers WHERE is_deleted != 1";
+    const { userId, offset } = req.query;
     const [customers] = await db.query({
-      sql: query,
-      values: [],
+      sql: `SELECT * FROM customers WHERE user_id = ? && is_deleted != 1 ORDER BY customer_name LIMIT 10 OFFSET ${offset}`,
+      values: [userId],
     });
     console.log(customers);
     res.status(200).json(BaseResponse.success(customers, 200));
@@ -100,12 +100,48 @@ export const getCustomers = async (req, res, next) => {
   }
 };
 
+export const getCustomerCount = async (req, res, next) => {
+  try {
+    const { userId } = req.query;
+    const query = "SELECT COUNT(*) AS count FROM customers WHERE user_id = ? && is_deleted != 1";
+    const [customer_count] = await db.query({
+      sql: query,
+      values: [userId],
+    });
+
+    res.status(200).json(BaseResponse.success(customer_count, 200));
+  } catch (error) {
+    res.status(500).json(BaseResponse.fail(error.message, error.statusCode));
+  }
+};
+
 export const searchCustomers = async (req, res, next) => {
   try {
-    const { text } = req.query;
+    const { text, userId } = req.query;
     const [customers] = await db.query({
-      sql: "SELECT * FROM customers WHERE customer_name LIKE ? and is_deleted = 0",
-      values: ["%" + text + "%"],
+      sql: "SELECT * FROM customers WHERE customer_name LIKE ? AND user_id = ? AND is_deleted = 0 ORDER BY customer_name LIMIT 10 OFFSET 0",
+      values: ["%" + text + "%", userId],
+    });
+    res.status(200).json(BaseResponse.success(customers, 200));
+  } catch (error) {
+    res.status(500).json(BaseResponse.fail(error.message, error.statusCode));
+  }
+};
+
+export const findCustomer = async (req, res, _) => {
+  try {
+    const { text, userId } = req.query;
+    const [customers] = await db.query({
+      sql: `
+      SELECT C.customer_id, C.customer_name FROM customers C
+      JOIN receipts R ON C.customer_id = R.customer_id
+      WHERE C.customer_name LIKE ? AND C.user_id = ? AND C.is_deleted = 0 AND R.is_deleted = 0
+      GROUP BY C.customer_id, C.customer_name
+      HAVING COUNT(R.receipt_id) > 0
+      ORDER BY C.customer_name
+      LIMIT 10 OFFSET 0;
+      `,
+      values: ["%" + text + "%", userId],
     });
     res.status(200).json(BaseResponse.success(customers, 200));
   } catch (error) {

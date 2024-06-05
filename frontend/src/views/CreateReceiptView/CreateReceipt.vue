@@ -152,7 +152,7 @@ const searchCustomer = async () => {
   clearTimeout(timer)
 
   timer = setTimeout(async () => {
-    await customerStore.searchCustomers(customerName.value)
+    await customerStore.searchCustomers(customerName.value, user.value.id)
   }, 500)
 }
 

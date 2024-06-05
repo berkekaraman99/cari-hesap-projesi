@@ -7,7 +7,6 @@ import { getLocalIP } from "./features/utils/ip_helper.js";
 dotenv.config();
 
 const app = express();
-const pbIp = getLocalIP();
 
 app.use(cors());
 app.use(express.json());
@@ -24,7 +23,7 @@ app.use((req, res, next) => {
 app.use("/api", RootRoutes);
 
 getLocalIP().then((ip) => {
-  app.listen(3000, ip, () => {
+  app.listen(3000, ip != null ? ip : "localhost", () => {
     console.log("Sunucu şu adreste çalışıyor", ip + ":" + 3000);
   });
 });

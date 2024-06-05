@@ -45,7 +45,11 @@
                     <li class="my-1">
                       <a
                         class="dropdown-item"
-                        @click="selectReceipt(receipt.receipt_id), changeReceiptSelected()"
+                        @click="
+                          selectReceipt(receipt.receipt_id),
+                            changeReceiptSelected(),
+                            createQr(receipt.receipt_id)
+                        "
                       >
                         <div class="py-1 d-flex align-items-center">
                           <i class="fa-solid fa-info me-2"></i>
@@ -95,6 +99,20 @@
           </tbody>
         </table>
         <h2 class="text-center fw-light my-3" v-else>Dekont bulunamadı</h2>
+        <div
+          v-if="receiptCount != null"
+          class="d-flex align-items-center justify-content-center my-3"
+        >
+          <template v-for="count in pageCount">
+            <span
+              class="mx-1 pointer fs-5 px-1"
+              :class="{ 'fw-bold bg-white text-black rounded-1': selectedPage == count }"
+              @click="selectedPage == count ? null : changePage(count)"
+            >
+              {{ count }}
+            </span>
+          </template>
+        </div>
       </div>
     </div>
     <Teleport to="body">
@@ -159,8 +177,20 @@ const toast = useToast()
 const receiptStore = useReceiptStore()
 const authStore = useAuthStore()
 
+const pageCount = ref<Array<number>>([])
+const selectedPage = ref(1)
+
+const changePage = (num: number) => {
+  selectedPage.value = num
+  receiptStore.fetchReceipts(user.value.id, (num - 1) * 10)
+}
+
 const { _user: user } = storeToRefs(authStore)
-const { _receipts: receipts, _qrCode: qrCode } = storeToRefs(receiptStore)
+const {
+  _receipts: receipts,
+  _qrCode: qrCode,
+  _receiptTotalCount: receiptCount
+} = storeToRefs(receiptStore)
 
 const isDeleting = ref(false)
 const selectedReceiptId = ref('')
@@ -170,6 +200,7 @@ const createQr = async (id: string) => {
   await receiptStore.getQrCode(id).then(() => {
     const image = document.createElement('img')
     image.src = qrCode.value
+    image.classList.add('qr-image')
     document.getElementById('qr')?.appendChild(image)
   })
 }
@@ -210,12 +241,22 @@ const fetchReceipts = async () => {
   })
 }
 
+const getReceiptCount = async () => {
+  await receiptStore.getReceiptTotalCount(user.value.id).then(() => {
+    let count = Math.ceil(receiptCount.value.count / 10.0)
+    for (let index = 0; index < count; index++) {
+      pageCount.value.push(index + 1)
+    }
+  })
+}
+
 const docType = (receiptType: number) => {
   return receiptType === 1 ? 'Alacak' : 'Borç'
 }
 
 onBeforeMount(async () => {
   await fetchReceipts()
+  await getReceiptCount()
 })
 
 const sortTable = (n: number) => {

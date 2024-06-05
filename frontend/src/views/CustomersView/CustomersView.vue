@@ -70,6 +70,20 @@
           </tbody>
         </table>
         <h2 class="text-center fw-light my-3" v-else>Tanımlı müşteri bulunamadı</h2>
+        <div
+          v-if="customerCount != null"
+          class="d-flex align-items-center justify-content-center my-3"
+        >
+          <template v-for="count in pageCount">
+            <span
+              class="mx-1 pointer fs-5 px-1"
+              :class="{ 'fw-bold bg-white text-black rounded-1': selectedPage == count }"
+              @click="selectedPage == count ? null : changePage(count)"
+            >
+              {{ count }}
+            </span>
+          </template>
+        </div>
       </div>
     </div>
     <!-- Modal -->
@@ -123,11 +137,28 @@ const toast = useToast()
 const authStore = useAuthStore()
 const customerStore = useCustomerStore()
 
+const pageCount = ref<Array<number>>([])
+const selectedPage = ref(1)
+
+const changePage = (num: number) => {
+  selectedPage.value = num
+  customerStore.fetchCustomers(user.value.id, (num - 1) * 10)
+}
+
 const { _user: user } = storeToRefs(authStore)
-const { _customers: customers } = storeToRefs(customerStore)
+const { _customers: customers, _customerCount: customerCount } = storeToRefs(customerStore)
 
 const getCustomers = async () => {
   await customerStore.fetchCustomers(user.value.id)
+}
+
+const getCustomerCount = async () => {
+  await customerStore.getCustomerCount(user.value.id).then(() => {
+    let count = Math.ceil(customerCount.value.count / 10.0)
+    for (let index = 0; index < count; index++) {
+      pageCount.value.push(index + 1)
+    }
+  })
 }
 
 const isDeleting = ref(false)
@@ -155,7 +186,10 @@ const customerType = (customerType: string) => {
   return customerType === 'company' ? 'Şirket' : 'Şahıs'
 }
 
-onMounted(() => getCustomers())
+onMounted(() => {
+  getCustomers()
+  getCustomerCount()
+})
 
 const dropdownItems = [
   {

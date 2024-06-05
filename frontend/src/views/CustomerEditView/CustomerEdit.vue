@@ -213,7 +213,7 @@ const update = async () => {
             timeout: 2500
           })
           setTimeout(() => {
-            router.push({ name: 'customers' })
+            router.replace({ name: 'customers' })
           }, 3000)
         } else {
           toast.error('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz', {

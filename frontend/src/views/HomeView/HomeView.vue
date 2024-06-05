@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import TheChart from '@/components/shared/TheChart.vue'
+import { useAuthStore } from '@/stores/auth'
 import { useReceiptStore } from '@/stores/receipt'
 import { storeToRefs } from 'pinia'
 import { onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 
+const authStore = useAuthStore()
+const { _user: user } = storeToRefs(authStore)
 const receiptStore = useReceiptStore()
 const { _receiptCount: receiptCount, _totalPrice: totalPrice } = storeToRefs(receiptStore)
 
 const router = useRouter()
 
 onBeforeMount(() => {
-  receiptStore.getReceiptCount()
+  receiptStore.getReceiptCount(user.value.id)
 })
 
 const goToCustomers = () => {
@@ -28,7 +31,7 @@ const goToCustomers = () => {
       <div class="row row-cols-1 row-cols-md-2 my-2">
         <div class="col-12 col-sm-12 col-md-12 col-lg-4">
           <div class="row">
-            <div class="col-12 col-sm-4 col-md-4 col-lg-12 mb-3">
+            <div class="col-12 col-sm-12 col-md-4 col-lg-12 mb-3">
               <div class="card card-body">
                 <div class="row">
                   <div class="col-12 col-lg-6">
@@ -49,7 +52,7 @@ const goToCustomers = () => {
                 </button>
               </div>
             </div>
-            <div class="col-12 col-sm-4 col-md-4 col-lg-12 mb-3">
+            <div class="col-12 col-sm-12 col-md-4 col-lg-12 mb-3">
               <div class="card card-body h-100 d-flex align-items-center justify-content-center">
                 <div class="row">
                   <div class="col-12 col-lg-6">
@@ -67,7 +70,7 @@ const goToCustomers = () => {
                 </div>
               </div>
             </div>
-            <div class="col-12 col-sm-4 col-md-4 col-lg-12 mb-3">
+            <div class="col-12 col-sm-12 col-md-4 col-lg-12 mb-3">
               <div class="card card-body h-100 d-flex align-items-center justify-content-center">
                 <div class="row">
                   <div class="col-12 col-lg-6">

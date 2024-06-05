@@ -62,10 +62,12 @@
                   @input="searchCustomer(customerOne)"
                 />
                 <datalist id="customer-one">
-                  <option
-                    v-for="customer in searchedCustomers"
-                    :value="customer.customer_name"
-                  ></option>
+                  <template v-for="customer in searchedCustomers">
+                    <option
+                      v-if="customer != null && customer.customer_name !== customerTwo"
+                      :value="customer.customer_name"
+                    ></option>
+                  </template>
                 </datalist>
               </td>
             </tr>
@@ -81,10 +83,12 @@
                   @input="searchCustomer2(customerTwo)"
                 />
                 <datalist id="customer-two">
-                  <option
-                    v-for="customer in searchedCustomers2"
-                    :value="customer.customer_name"
-                  ></option>
+                  <template v-for="customer in searchedCustomers2">
+                    <option
+                      v-if="customer != null && customer.customer_name !== customerOne"
+                      :value="customer.customer_name"
+                    ></option>
+                  </template>
                 </datalist>
               </td>
             </tr>
@@ -122,8 +126,9 @@
         />
       </form>
     </div>
-    <TransitionGroup name="fade">
+    <Transition name="fade" mode="out-in">
       <div class="card card-body my-4" v-if="report.length > 0">
+        <h3 class="mb-3 border-bottom">Rapor Sonucu</h3>
         <table class="table table-bordered table-hover shadow-sm">
           <thead>
             <tr>
@@ -173,15 +178,12 @@
           </tbody>
         </table>
       </div>
-    </TransitionGroup>
+    </Transition>
     <div v-show="cReport != null">
       <div class="card p-4 my-3">
         <h3 class="border-bottom d-inline">Alacak - Borç Karşılaştırması</h3>
         <div class="">
           <div class="row">
-            <div class="col-12">
-              <canvas id="myChart3" class="chartjs-render-monitor"></canvas>
-            </div>
             <div class="col-12 col-sm-6">
               <canvas id="myChart1" class="chartjs-render-monitor"></canvas>
             </div>
@@ -202,6 +204,7 @@ import { storeToRefs } from 'pinia'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import Chart from 'chart.js/auto'
 import { Months } from '@/constants/months'
+import { useAuthStore } from '@/stores/auth'
 
 const reportType = ref('all-reports')
 let ctx1: any
@@ -227,6 +230,8 @@ window.addEventListener('resize', function () {
 const labels = ref<string[]>([])
 Object.values(Months).forEach((value) => labels.value.push(value))
 
+const authStore = useAuthStore()
+const { _user: user } = storeToRefs(authStore)
 const receiptStore = useReceiptStore()
 const {
   _receiptReport: report,
@@ -235,7 +240,7 @@ const {
   _receiptCountReport: receiptCount
 } = storeToRefs(receiptStore)
 const customerStore = useCustomerStore()
-const { _searchedCustomers: searchCustomers } = storeToRefs(customerStore)
+const { _foundCustomers: foundCustomers } = storeToRefs(customerStore)
 
 const customerOne = ref('')
 const customerTwo = ref('')
@@ -265,7 +270,8 @@ const getReport = async () => {
       sortBy: sortBy.value,
       sort: sort.value,
       startDate: dateStart.value,
-      endDate: dateEnd.value
+      endDate: dateEnd.value,
+      userId: user.value.id
     })
   } else {
     receiptStore.$patch({
@@ -276,10 +282,15 @@ const getReport = async () => {
         startDate: dateStart.value,
         endDate: dateEnd.value,
         customer_one: customerOne.value,
-        customer_two: customerTwo.value
+        customer_two: customerTwo.value,
+        userId: user.value.id
       })
       .then(() => {
         console.log(cReport.value)
+        if (doughnutChartAlacak != null && doughnutChartBorc != null) {
+          doughnutChartAlacak.destroy()
+          doughnutChartBorc.destroy()
+        }
 
         const alacak: Array<number> = []
         const borc: Array<number> = []
@@ -331,8 +342,8 @@ const searchCustomer = async (text: string) => {
   clearTimeout(timer)
 
   timer = setTimeout(async () => {
-    await customerStore.searchCustomers(text).then(() => {
-      searchedCustomers.value = searchCustomers.value
+    await customerStore.findCustomer(text, user.value.id).then(() => {
+      searchedCustomers.value = foundCustomers.value
     })
   }, 500)
 }
@@ -341,8 +352,8 @@ const searchCustomer2 = async (text: string) => {
   clearTimeout(timer)
 
   timer = setTimeout(async () => {
-    await customerStore.searchCustomers(text).then(() => {
-      searchedCustomers2.value = searchCustomers.value
+    await customerStore.findCustomer(text, user.value.id).then(() => {
+      searchedCustomers2.value = foundCustomers.value
     })
   }, 500)
 }

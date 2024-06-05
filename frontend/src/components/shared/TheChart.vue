@@ -44,9 +44,12 @@ import Chart from 'chart.js/auto'
 import { storeToRefs } from 'pinia'
 import { ref, onMounted } from 'vue'
 import { Months } from '@/constants/months'
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
+const { _user: user } = storeToRefs(authStore)
 const receiptStore = useReceiptStore()
-const { _totalPrice: totalPrice } = storeToRefs(receiptStore)
+const { _totalPrice: totalPrice, _receiptMinMaxYear: minMaxYears } = storeToRefs(receiptStore)
 
 const debtData = ref<number[]>(new Array(12).fill(0))
 const receivableData = ref<number[]>(new Array(12).fill(0))
@@ -59,13 +62,18 @@ Object.values(Months).forEach((value) => labels.value.push(value))
 
 const selectedYear = ref(new Date().getFullYear())
 const years = ref<number[]>([])
-for (let i = 0; i < 10; i++) {
-  years.value.push(selectedYear.value - i)
+
+const getYears = async () => {
+  await receiptStore.getMinMaxYear(user.value.id).then(() => {
+    for (let i = minMaxYears.value.first_year; i <= new Date().getFullYear(); i++) {
+      years.value.push(i)
+    }
+  })
 }
 
 const getDataAndInitChart = async () => {
   await receiptStore
-    .getReceiptTotalPrices(selectedYear.value)
+    .getReceiptTotalPrices(selectedYear.value, user.value.id)
     .then(() => console.log(totalPrice.value))
     .then(() => {
       totalPrice.value.debtTotalPrice.forEach((data: any) => {
@@ -133,6 +141,7 @@ const updateChart = async () => {
 onMounted(async () => {
   ctx = document.getElementById('myChart')
   getDataAndInitChart()
+  getYears()
 })
 
 window.addEventListener('resize', function () {

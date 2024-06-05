@@ -57,11 +57,13 @@ const closeDialog = () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 400px;
+  width: 400px;
+}
 
-  & img {
-    height: 400px;
-    width: 400px;
-  }
+.qr-image {
+  height: 400px;
+  width: 400px;
 }
 
 p span {

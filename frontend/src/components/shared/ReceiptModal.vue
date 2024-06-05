@@ -18,13 +18,18 @@
             <div>
               <div class="border-top border-3 border-bottom p-2 mb-2">
                 <!-- <p>{{ receipt }}</p> -->
-                <p>{{ receipt.company_name }}</p>
-                <p>
-                  <span>Vergi Dairesi:</span>
-                  {{ receipt.user_tax_a + ' - ' + receipt.user_tax_ac }}
-                </p>
-                <p><span>VKN: </span> {{ receipt.user_tax }}</p>
-                <p><span>Adres:</span> {{ receipt.user_address }}</p>
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <p>{{ receipt.company_name }}</p>
+                    <p>
+                      <span>Vergi Dairesi:</span>
+                      {{ receipt.user_tax_a + ' - ' + receipt.user_tax_ac }}
+                    </p>
+                    <p><span>VKN: </span> {{ receipt.user_tax }}</p>
+                    <p><span>Adres:</span> {{ receipt.user_address }}</p>
+                  </div>
+                  <div id="qr" class="float-end"></div>
+                </div>
               </div>
 
               <div class="border-top border-3 border-bottom p-2 mb-2">

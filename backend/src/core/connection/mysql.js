@@ -91,6 +91,16 @@ CREATE TABLE IF NOT EXISTS receipts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 `;
 
+const createProcGetReceiptById = `
+CREATE PROCEDURE IF NOT EXISTS get_receipt_by_id(IN receiptid VARCHAR(255))
+BEGIN
+  SELECT document_no, receipts.description, price, receipt_type, receipts.created_date, payment_method, customer_name, customers.tax_number customer_tax, customers.tax_administration customer_tax_a, customers.tax_administration_city customer_tax_ac, customer_type, customers.address customer_address,
+  users.address user_address, users.company_name, users.tax_number user_tax, users.tax_administration user_tax_a, users.tax_administration_city user_tax_ac
+  FROM receipts LEFT JOIN customers ON receipts.customer_id = customers.customer_id LEFT JOIN users ON receipts.user_id = users.id 
+  WHERE receipts.receipt_id = receiptid;
+END 
+`;
+
 createTableConnection.connect((err) => {
   if (err) {
     console.error("Error connecting to MySQL: " + err.stack);
@@ -120,6 +130,14 @@ createTableConnection.connect((err) => {
       return;
     }
     console.log("Table created successfully");
+  });
+
+  createTableConnection.query(createProcGetReceiptById, (err, results, fields) => {
+    if (err) {
+      console.error("Error creating table: " + err.stack);
+      return;
+    }
+    console.log("Procedure created successfully");
 
     createTableConnection.end();
   });

@@ -1,8 +1,10 @@
 <template>
-  <div class="loading-backdrop"></div>
-  <div class="loading-spinner">
-    <div class="lds-dual-ring"></div>
-    <!-- <div class="fw-bold">Yükleniyor...</div> -->
+  <div>
+    <div class="loading-backdrop"></div>
+    <div class="loading-spinner">
+      <div class="lds-dual-ring"></div>
+      <!-- <div class="fw-bold">Yükleniyor...</div> -->
+    </div>
   </div>
 </template>
 
